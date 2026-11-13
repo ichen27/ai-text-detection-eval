@@ -1,0 +1,9 @@
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+*.token
+.env
+# Raw third-party downloads stay outside the repository; see data/README.md.
+raw/
