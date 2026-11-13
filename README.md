@@ -236,6 +236,23 @@ Clef scoring (about 0.30 dollars) and 343 generated texts. With discarded trial 
 estimated at 2 to 5 dollars. This is an estimate, not a bill. Binoculars and the classifier run locally:
 about 20 minutes and 55 minutes on an Apple M4, using 3 to 5 GB of memory.
 
+## Artifacts
+
+| Artifact | Where | Format | How to use or reproduce |
+|---|---|---|---|
+| Both evaluation sets | [data/eval_set.jsonl](data/eval_set.jsonl), [data/long_set.jsonl](data/long_set.jsonl) | JSON Lines | Fields in [data/README.md](data/README.md) |
+| Generated texts and training mirrors | [data/](data/) | JSON Lines | `generate`, `generate_long`, `generate_mirrors` |
+| Scores per detector | [results/scores/](results/scores/), [results/scores_long/](results/scores_long/), [results/detectors/](results/detectors/) | JSON Lines | `score`, `score_long`, `binoculars`, `classify` |
+| Reports | [results/report.md](results/report.md), [results/comparison.md](results/comparison.md), with `.json` twins | Markdown, JSON | `report`, `compare` |
+| Figures | [results/figures/](results/figures/) | PNG | `report`, `compare` |
+| Trained classifiers (2 × 306 MB) | [release v0.2.0](https://github.com/ichen27/ai-text-detection-eval/releases/tag/v0.2.0) | Hugging Face model folders, gzipped tar | Extract into `RAW_DATA_DIR/models/`, then `python -m detecteval.classify raid mirrors`; or retrain with `train_classifier` |
+
+SHA-256 of the release files: `classifier-raid.tar.gz` `81ae99d8aa214fe596a5799cac1b5a19c8f67da5989284e9639a3431d535a9f5`,
+`classifier-mirrors.tar.gz` `796710924d893414557d895c9cb5b0a2b225d7cacc12686413625885ac621262`.
+
+Raw third-party downloads are not redistributed; [data/README.md](data/README.md) lists the commands that
+fetch them.
+
 ## Layout
 
 ```
