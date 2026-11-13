@@ -30,6 +30,7 @@ COMBINATIONS = {
     "clef+binoculars": ("Clef + Binoculars", ["clef", "binoculars"]),
     "clef+classifier": ("Clef + classifier (mirrors)", ["clef", "classifier-mirrors"]),
     "all-three": ("Clef + Binoculars + classifier (mirrors)", ["clef", "binoculars", "classifier-mirrors"]),
+    "local-two": ("Binoculars + classifier (mirrors)", ["binoculars", "classifier-mirrors"]),
 }
 GROUP_LABELS = {
     "raid_human": "Human: RAID documents",
@@ -44,6 +45,10 @@ GROUP_LABELS = {
     "fresh_2026": "AI: 2026 models",
     "humanized_2026": "AI: 2026 models, humanized",
 }
+# Detectors compared head to head. A text counts only if every one of these has scored it, so no detector
+# is judged on an easier or harder set of texts than another.
+CORE = ["clef", "binoculars", "fastdetect", "classifier-raid", "classifier-mirrors"]
+LOCAL = ["binoculars", "fastdetect", "classifier-raid", "classifier-mirrors"]     # need no paid API
 SEEN_GENERATORS = {name.rsplit("/", 1)[1] for name in TRAIN_GENERATORS}
 SLICES = [("short", 150)] + [("long", rung) for rung in config.RUNGS]
 
@@ -96,8 +101,14 @@ def load_scores() -> dict[str, dict[str, float]]:
     return {name: values for name, values in scores.items() if values}
 
 
-def keys_of(texts: dict, text_set: str, rung: int) -> list[str]:
-    return [key for key, text in texts.items() if text["set"] == text_set and text["rung"] == rung]
+def keys_of(texts: dict, text_set: str, rung: int, scores: dict | None = None,
+            required: list[str] | None = None) -> list[str]:
+    """Keys of one slice; with ``scores``, only those every required (default: core) detector has scored."""
+    keys = [key for key, text in texts.items() if text["set"] == text_set and text["rung"] == rung]
+    if scores:
+        core = [scores[name] for name in (required or CORE) if name in scores]
+        keys = [key for key in keys if all(key in detector for detector in core)]
+    return keys
 
 
 def values(keys: list[str], texts: dict, scores: dict[str, float], **where) -> np.ndarray:
@@ -146,50 +157,57 @@ def flagged(keys: list[str], texts: dict, scores: dict[str, float], threshold: f
             "ci95": metrics.wilson_interval(count, int(group.size))}
 
 
+def evaluate_slice(keys: list[str], texts: dict, scores: dict, names: list[str]) -> dict:
+    """Overall and per-group results for the named detectors and every combination they allow."""
+    # A detector that has scored only part of a slice would be judged on an arbitrary subset, so it is left out.
+    local = {name: scores[name] for name in names
+             if name in scores and keys and sum(key in scores[name] for key in keys) >= 0.98 * len(keys)}
+    for name, (_, parts) in COMBINATIONS.items():
+        if all(part in local for part in parts):
+            combined = combine(keys, texts, scores, parts)
+            if combined:
+                local[name] = combined
+    entry: dict = {"n_texts": len(keys), "detectors": {}}
+    for name, detector_scores in local.items():
+        overall = evaluate(keys, texts, detector_scores)
+        if overall is None:
+            continue
+        groups = {}
+        for group in GROUP_LABELS:
+            cell = flagged(keys, texts, detector_scores, overall["threshold_5pct"], group=group)
+            if cell:
+                groups[group] = cell
+        writers = {}
+        for label, seen in (("seen in training", True), ("never seen in training", False)):
+            rows = [key for key in keys if texts[key]["group"] == "fresh_2026" and texts[key]["split"] == "test"
+                    and key in detector_scores and (texts[key]["generator"] in SEEN_GENERATORS) == seen]
+            count = sum(detector_scores[key] > overall["threshold_5pct"] for key in rows)
+            writers[label] = {"n": len(rows), "flagged": int(count), "share": count / len(rows) if rows else None,
+                              "ci95": metrics.wilson_interval(int(count), len(rows))}
+        entry["detectors"][name] = {**overall, "groups": groups, "fresh_2026_by_generator": writers}
+    return entry
+
+
 def analyse() -> dict:
     texts, scores = load_texts(), load_scores()
-    out: dict = {"slices": {}, "detectors": {name: DETECTORS[name] for name in scores},
+    out: dict = {"slices": {}, "local_slices": {}, "detectors": {name: DETECTORS[name] for name in scores},
                  "combinations": {name: label for name, (label, _) in COMBINATIONS.items()}}
     for text_set, rung in SLICES:
-        keys = keys_of(texts, text_set, rung)
-        local = dict(scores)
-        for name, (_, parts) in COMBINATIONS.items():
-            if all(part in scores for part in parts):
-                combined = combine(keys, texts, scores, parts)
-                if combined:
-                    local[name] = combined
-        entry: dict = {"n_texts": len(keys), "detectors": {}}
-        for name, detector_scores in local.items():
-            overall = evaluate(keys, texts, detector_scores)
-            if overall is None:
-                continue
-            groups = {}
-            for group in GROUP_LABELS:
-                cell = flagged(keys, texts, detector_scores, overall["threshold_5pct"], group=group)
-                if cell:
-                    groups[group] = cell
-            writers = {}
-            for seen, generators in (("seen in training", SEEN_GENERATORS), ("never seen in training", None)):
-                rows = [key for key in keys if texts[key]["group"] == "fresh_2026" and texts[key]["split"] == "test"
-                        and key in detector_scores
-                        and (texts[key]["generator"] in SEEN_GENERATORS) == (generators is not None)]
-                count = sum(detector_scores[key] > overall["threshold_5pct"] for key in rows)
-                writers[seen] = {"n": len(rows), "flagged": int(count),
-                                 "share": count / len(rows) if rows else None,
-                                 "ci95": metrics.wilson_interval(int(count), len(rows))}
-            entry["detectors"][name] = {**overall, "groups": groups, "fresh_2026_by_generator": writers}
+        entry = evaluate_slice(keys_of(texts, text_set, rung, scores), texts, scores, list(DETECTORS))
+        entry["n_in_set"] = len(keys_of(texts, text_set, rung))
         out["slices"][f"{text_set}@{rung}"] = entry
+    # The detectors that run locally have scored every long-set text, including ones a paid model has not.
+    for rung in config.RUNGS:
+        out["local_slices"][f"long@{rung}"] = evaluate_slice(keys_of(texts, "long", rung, scores, LOCAL), texts,
+                                                              scores, LOCAL)
 
     # The 500-word rung covers fewer documents; score the same documents at 300 words for a fair comparison.
-    long_500 = {texts[key]["id"] for key in keys_of(texts, "long", 500)}
-    same_docs = [key for key in keys_of(texts, "long", 300) if texts[key]["id"] in long_500]
-    out["slices"]["long@300 (documents that reach 500 words)"] = {
-        "n_texts": len(same_docs),
-        "detectors": {name: result for name, detector_scores in scores.items()
-                      if (result := evaluate(same_docs, texts, detector_scores))}}
+    long_500 = {texts[key]["id"] for key in keys_of(texts, "long", 500, scores, LOCAL)}
+    same_docs = [key for key in keys_of(texts, "long", 300, scores, LOCAL) if texts[key]["id"] in long_500]
+    out["local_slices"]["long@300 (documents that reach 500 words)"] = evaluate_slice(same_docs, texts, scores, LOCAL)
 
     # Does the model treat human text it may have memorised differently from text it cannot have seen?
-    keys = keys_of(texts, "long", 300)
+    keys = keys_of(texts, "long", 300, scores)
     out["seen_vs_unseen_humans"] = {}
     for name, detector_scores in scores.items():
         older = values(keys, texts, detector_scores, group="forum_2019")

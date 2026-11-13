@@ -18,6 +18,7 @@ BATCH = 8
 
 
 def main() -> None:
+    config.cap_gpu_memory()
     import torch
     from transformers import AutoModelForSequenceClassification, AutoTokenizer
 
@@ -34,7 +35,7 @@ def main() -> None:
         with torch.no_grad():
             for start in range(0, len(items), BATCH):
                 chunk = items[start:start + BATCH]
-                inputs = tokenizer([item["text"] for item in chunk], return_tensors="pt", padding=True,
+                inputs = tokenizer([item["text"] for item in chunk], return_tensors="pt", padding="max_length",
                                    truncation=True, max_length=MAX_TOKENS).to(device)
                 logits = model(**inputs).logits.float()
                 # The log-odds keep more resolution than a probability that saturates at 1.0.

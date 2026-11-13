@@ -2,8 +2,10 @@
 
 Two recipes:
   raid      RAID human documents and 2023-era machine text only (eight domains, eleven generators)
-  mirrors   the same, plus human Stack Exchange posts from 2017-2018 and "mirror" texts written by four
-            current models on the titles of human training documents (see ``generate_mirrors``)
+  mirrors   an update set for a model already trained on ``raid``: "mirror" texts written by four
+            current models on the titles of human training documents (see ``generate_mirrors``),
+            human Stack Exchange posts from 2017-2018, and a sample of the RAID examples so the
+            model does not forget them
 
 Exclusions that keep the evaluation honest:
   * every RAID source document used by an evaluation set, with all machine text generated from it;
@@ -25,6 +27,7 @@ from .textprep import normalise, strip_markdown, strip_preamble
 
 AI_PER_HUMAN = 2
 MIRROR_REPEATS = 3          # mirrors are few; each is seen this many times per epoch, cropped differently
+RAID_REPLAY = 4000          # RAID examples mixed into the mirror update
 VALIDATION_SHARE = 0.04
 MIN_WORDS = 50
 
@@ -78,7 +81,9 @@ def load(recipe: str, seed: int = config.SEED) -> tuple[list[dict], list[dict]]:
     """Return (training examples, validation examples), split by source document."""
     if recipe not in ("raid", "mirrors"):
         raise ValueError("recipe must be 'raid' or 'mirrors'")
-    examples = raid_examples(seed) + (mirror_examples() if recipe == "mirrors" else [])
+    examples = raid_examples(seed)
+    if recipe == "mirrors":
+        examples = random.Random(seed + 32).sample(examples, RAID_REPLAY) + mirror_examples()
     examples = [example for example in examples if len(example["text"].split()) >= MIN_WORDS]
     sources = sorted({example["source_id"] for example in examples})
     random.Random(seed + 31).shuffle(sources)

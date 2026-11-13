@@ -17,9 +17,9 @@ SHORT_NAMES = {"clef": "Clef 27B (asked, no training)", "binoculars": "Binocular
                "classifier-raid": "Classifier: RAID only", "classifier-mirrors": "Classifier: RAID + mirrors",
                "all-three": "All three combined", "fastdetect": "Fast-DetectGPT (0.5B pair)",
                "clef-flash": "Clef-flash 9B", "clef-omni": "Clef-omni", "clef+binoculars": "Clef + Binoculars",
-               "clef+classifier": "Clef + classifier (mirrors)"}
+               "clef+classifier": "Clef + classifier (mirrors)", "local-two": "Binoculars + classifier (mirrors)"}
 ORDER = ["clef", "clef-flash", "clef-omni", "binoculars", "fastdetect", "classifier-raid", "classifier-mirrors",
-         "clef+binoculars", "clef+classifier", "all-three"]
+         "clef+binoculars", "clef+classifier", "local-two", "all-three"]
 
 
 def pct(value: float | None) -> str:
@@ -56,78 +56,100 @@ def group_table(entry: dict, names: list[str]) -> list[str]:
     return lines
 
 
+def ladder_table(slices: dict, names: list[str], rungs: list[int]) -> list[str]:
+    lines = ["| Detector | " + " | ".join(f"{rung} words" for rung in rungs) + " |", "|---|" + "---|" * len(rungs)]
+    for name in names:
+        cells = []
+        for rung in rungs:
+            d = slices.get(f"long@{rung}", {}).get("detectors", {}).get(name)
+            cells.append(f"{pct(d['tpr_5pct'])} ({pct(d['fpr_5pct'])})" if d else "")
+        if any(cells):
+            lines.append(f"| {SHORT_NAMES[name]} | " + " | ".join(cells) + " |")
+    return lines
+
+
+def generator_table(entry: dict) -> list[str]:
+    lines = ["| Detector | Generators seen in training | Generators never seen in training |", "|---|---|---|"]
+    for name in ORDER:
+        d = entry["detectors"].get(name)
+        if d and d["fresh_2026_by_generator"]["seen in training"]["n"]:
+            seen, unseen = (d["fresh_2026_by_generator"][k] for k in ("seen in training", "never seen in training"))
+            lines.append(f"| {SHORT_NAMES[name]} | {pct(seen['share'])} of {seen['n']} | "
+                         f"{pct(unseen['share'])} of {unseen['n']} |")
+    return lines
+
+
 def markdown(summary: dict) -> str:
-    slices = summary["slices"]
+    slices, local = summary["slices"], summary["local_slices"]
+    main = ["clef", "binoculars", "classifier-raid", "classifier-mirrors", "all-three"]
     lines = [
         "# Detector comparison", "",
         "Each text is in a calibration half or a test half. The bar for flagging a text, and the weights of the "
         "combined detectors, were set on the calibration half. Every number below is measured on the test half, "
-        "so \"humans actually flagged\" can differ from the 5% or 1% the bar was set for.", "",
+        "so \"humans actually flagged\" can differ from the 5% or 1% the bar was set for. Detectors are compared "
+        "only on texts that all of them have scored.", "",
         "Detectors:", ""]
     lines += [f"- **{SHORT_NAMES[name]}**: {DETECTORS[name]}" for name in ORDER if name in summary["detectors"]]
     lines += [f"- **{SHORT_NAMES[name]}**: logistic regression over {', '.join(parts)}"
               for name, (_, parts) in COMBINATIONS.items()]
-    lines += ["", "## 1. Does longer text help? The same documents cut to four lengths", ""]
-    ladder = ["clef", "binoculars", "classifier-raid", "classifier-mirrors", "all-three"]
-    rungs = [rung for rung in config.RUNGS if f"long@{rung}" in slices]
-    lines += ["AI text caught when the bar is set to flag 5% of humans (humans actually flagged in brackets).", "",
-              "| Detector | " + " | ".join(f"{rung} words" for rung in rungs) + " |", "|---|" + "---|" * len(rungs)]
-    for name in ladder:
-        cells = []
-        for rung in rungs:
-            d = slices[f"long@{rung}"]["detectors"].get(name)
-            cells.append(f"{pct(d['tpr_5pct'])} ({pct(d['fpr_5pct'])})" if d else "")
-        if any(cells):
-            lines.append(f"| {SHORT_NAMES[name]} | " + " | ".join(cells) + " |")
-    sizes = ", ".join(f"{rung} words: {slices[f'long@{rung}']['n_texts']}" for rung in rungs)
-    lines += ["", f"Texts per length (both halves): {sizes}. The 500-word column covers fewer documents, "
-              "almost none of them 2023-model text, so compare it with the next table rather than with the "
-              "300-word column.", ""]
-    same = slices.get("long@300 (documents that reach 500 words)")
-    if same and "long@500" in slices:
-        lines += ["Same documents at 300 and at 500 words:", "", "| Detector | 300 words | 500 words |",
+
+    lines += ["", "## 1. Does longer text help? The same documents cut to several lengths", "",
+              "AI text caught when the bar is set to flag 5% of humans (humans actually flagged in brackets).", ""]
+    rungs = [rung for rung in (75, 150, 300) if f"long@{rung}" in slices]
+    lines += ladder_table(slices, main, rungs)
+    entry = slices["long@300"]
+    lines += ["", f"{entry['n_texts']} of the long set's {entry['n_in_set']} documents have been scored by every "
+              "detector, including Clef. " + (
+                  "The rest are 2026-model texts that Clef has not scored yet, so this table covers human text and "
+                  "2023-era machine text only." if entry["n_texts"] < entry["n_in_set"] else "")]
+    lines += ["", "The detectors that run locally have scored every document, including the 2026-model texts:", ""]
+    lines += ladder_table(local, ["binoculars", "classifier-raid", "classifier-mirrors", "local-two"],
+                          [75, 150, 300])
+    same = local.get("long@300 (documents that reach 500 words)")
+    if same and "long@500" in local:
+        lines += ["", f"Going from 300 to 500 words, on the {same['n_texts']} documents long enough for both "
+                  "(mostly human text and 2026-model text):", "", "| Detector | 300 words | 500 words |",
                   "|---|---|---|"]
-        for name in ladder:
-            a, b = same["detectors"].get(name), slices["long@500"]["detectors"].get(name)
-            if a and b:
-                lines.append(f"| {SHORT_NAMES[name]} | {pct(a['tpr_5pct'])} ({pct(a['fpr_5pct'])}) | "
-                             f"{pct(b['tpr_5pct'])} ({pct(b['fpr_5pct'])}) |")
-    for title, key in (("## 2. All detectors at 300 words", "long@300"),
-                       ("## 5. The first test set (150 words or fewer)", "short@150")):
-        if key in slices:
-            lines += ["", title, ""] + overall_table(slices[key])
-            lines += ["", "Share of each group flagged as AI, bar set for 5% of humans:", ""]
-            lines += group_table(slices[key], ["clef", "binoculars", "classifier-raid", "classifier-mirrors",
-                                               "all-three"])
-        if key == "long@300":
-            lines += ["", "## 3. Human writing the models cannot have seen", "",
-                      "Forum posts from the same sites: 2019 (possibly in training data) against posts published "
-                      "after the Clef models were released. An AUROC of 0.5 means the detector scores the two "
-                      "alike; above 0.5 means recent posts look more AI-like to it.", "",
-                      "| Detector | 2019 posts | Recent posts | AUROC, recent over 2019 (95% CI) |",
-                      "|---|---|---|---|"]
-            for name in ORDER:
-                row = summary["seen_vs_unseen_humans"].get(name)
-                if row:
-                    lines.append(f"| {SHORT_NAMES[name]} | {row['n_2019']} | {row['n_recent']} | "
-                                 f"{row['auroc_recent_over_2019']:.2f} ({row['auroc_ci95'][0]:.2f}-"
-                                 f"{row['auroc_ci95'][1]:.2f}) |")
-            lines += ["", "## 4. Current models the classifier was and was not trained on", "",
-                      "Share of 2026-model texts flagged (300 words, bar set for 5% of humans). \"Seen\" are the "
-                      "four generators that wrote the training mirrors; the other four never appear in training.", "",
-                      "| Detector | Seen in training | Never seen in training |", "|---|---|---|"]
-            for name in ORDER:
-                d = slices[key]["detectors"].get(name)
-                if d:
-                    seen, unseen = (d["fresh_2026_by_generator"][k] for k in ("seen in training",
-                                                                              "never seen in training"))
-                    lines.append(f"| {SHORT_NAMES[name]} | {pct(seen['share'])} of {seen['n']} | "
-                                 f"{pct(unseen['share'])} of {unseen['n']} |")
-            if summary["polish_effect"]:
-                lines += ["", "Human text polished by a 2026 model: share of pairs whose score rose after polishing.",
-                          "", "| Detector | Pairs | Score rose |", "|---|---|---|"]
-                lines += [f"| {SHORT_NAMES[name]} | {row['n_pairs']} | {pct(row['share_increased'])} |"
-                          for name in ORDER if (row := summary["polish_effect"].get(name))]
+        for name in ["binoculars", "classifier-raid", "classifier-mirrors", "local-two"]:
+            before, after = same["detectors"].get(name), local["long@500"]["detectors"].get(name)
+            if before and after:
+                lines.append(f"| {SHORT_NAMES[name]} | {pct(before['tpr_5pct'])} ({pct(before['fpr_5pct'])}) | "
+                             f"{pct(after['tpr_5pct'])} ({pct(after['fpr_5pct'])}) |")
+
+    lines += ["", "## 2. All detectors at 300 words", ""] + overall_table(slices["long@300"])
+    lines += ["", "Share of each group flagged as AI, bar set for 5% of humans:", ""]
+    lines += group_table(slices["long@300"], main)
+    lines += ["", "Local detectors on every 300-word document, including 2026-model texts:", ""]
+    lines += overall_table(local["long@300"]) + [""]
+    lines += group_table(local["long@300"], ["binoculars", "classifier-raid", "classifier-mirrors", "local-two"])
+
+    lines += ["", "## 3. Human writing the models cannot have seen", "",
+              "Forum posts from the same sites: 2019 (possibly in training data) against posts published "
+              "after the Clef models were released. An AUROC of 0.5 means the detector scores the two "
+              "alike; above 0.5 means recent posts look more AI-like to it.", "",
+              "| Detector | 2019 posts | Recent posts | AUROC, recent over 2019 (95% CI) |", "|---|---|---|---|"]
+    for name in ORDER:
+        row = summary["seen_vs_unseen_humans"].get(name)
+        if row:
+            lines.append(f"| {SHORT_NAMES[name]} | {row['n_2019']} | {row['n_recent']} | "
+                         f"{row['auroc_recent_over_2019']:.2f} ({row['auroc_ci95'][0]:.2f}-"
+                         f"{row['auroc_ci95'][1]:.2f}) |")
+
+    lines += ["", "## 4. The first test set (150 words or fewer)", ""] + overall_table(slices["short@150"])
+    lines += ["", "Share of each group flagged as AI, bar set for 5% of humans:", ""]
+    lines += group_table(slices["short@150"], main)
+
+    lines += ["", "## 5. Current models the classifier was and was not trained on", "",
+              "Share of 2026-model texts flagged, bar set for 5% of humans. \"Seen\" are the four generators that "
+              "wrote the training mirrors; the other four never appear in training.", "",
+              "Short set:", ""] + generator_table(slices["short@150"])
+    lines += ["", "Long set at 300 words (local detectors):", ""] + generator_table(local["long@300"])
+    if summary["polish_effect"]:
+        lines += ["", "## 6. Human text polished by a 2026 model", "",
+                  "Share of pairs whose score rose after polishing (300 words).", "",
+                  "| Detector | Pairs | Score rose |", "|---|---|---|"]
+        lines += [f"| {SHORT_NAMES[name]} | {row['n_pairs']} | {pct(row['share_increased'])} |"
+                  for name in ORDER if (row := summary["polish_effect"].get(name))]
     return "\n".join(lines) + "\n"
 
 
@@ -148,28 +170,31 @@ def figure_ladder(summary: dict, path) -> None:
     ax.set_axisbelow(True)
     ends = []
     for name, color in COLORS.items():
-        points = [(rung, 100 * d["tpr_5pct"]) for rung in rungs
+        points = [(index, 100 * d["tpr_5pct"]) for index, rung in enumerate(rungs)
                   if (d := summary["slices"][f"long@{rung}"]["detectors"].get(name))]
         if len(points) < 2:
             continue
         xs, ys = zip(*points, strict=True)
-        ax.plot(range(len(xs)), ys, color=color, linewidth=2, marker="o", markersize=8, markeredgecolor=SURFACE,
-                markeredgewidth=2, label=SHORT_NAMES[name])
-        ends.append((ys[-1], name, color))
+        ax.plot(xs, ys, color=color, linewidth=2, marker="o", markersize=8, markeredgecolor=SURFACE,
+                markeredgewidth=2)
+        ends.append((ys[-1], xs[-1], name, color))
     # Direct labels at the line ends, nudged apart so they do not collide.
     ends.sort()
-    placed = []
-    for value, name, color in ends:
+    placed: list[float] = []
+    for value, x, name, color in ends:
         y = value if not placed or value - placed[-1] >= 5 else placed[-1] + 5
         placed.append(y)
-        ax.text(len(rungs) - 1 + 0.08, y, f"{SHORT_NAMES[name]}  {value:.0f}%", va="center", fontsize=9, color=INK)
-        ax.plot([len(rungs) - 1 + 0.02, len(rungs) - 1 + 0.06], [value, y], color=color, linewidth=1)
+        ax.plot([x + 0.03, x + 0.09], [value, y], color=color, linewidth=1)
+        ax.text(x + 0.11, y, f"{SHORT_NAMES[name]}  {value:.0f}%", va="center", fontsize=9, color=INK)
     ax.set_xticks(range(len(rungs)), [f"{rung} words" for rung in rungs])
     ax.set_xlim(-0.15, len(rungs) - 1 + 1.25)
     ax.set_ylim(0, 105)
     ax.set_ylabel("% of AI texts caught", fontsize=9, color=MUTED)
-    ax.set_title("AI text caught as the same documents get longer\nBar set to flag 5% of human texts, measured on "
-                 "held-out texts", fontsize=11, color=INK, loc="left")
+    entry = summary["slices"]["long@300"]
+    scope = ("human and 2023-model texts" if entry["n_texts"] < entry.get("n_in_set", entry["n_texts"])
+             else "all long-set texts")
+    ax.set_title(f"AI text caught as the same documents get longer ({scope})\nBar set to flag 5% of human texts, "
+                 "measured on held-out texts", fontsize=11, color=INK, loc="left")
     fig.tight_layout()
     fig.savefig(path, dpi=160, facecolor=SURFACE)
     plt.close(fig)

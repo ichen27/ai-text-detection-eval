@@ -77,6 +77,7 @@ def statistics_torch(observer_logits, performer_logits, tokens) -> dict:
 
 
 def main() -> None:
+    config.cap_gpu_memory("0.45")
     import torch
     from transformers import AutoModelForCausalLM, AutoTokenizer
 

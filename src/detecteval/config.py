@@ -44,6 +44,13 @@ def raw_dir() -> Path:
     return path
 
 
+def cap_gpu_memory(share: str = "0.3") -> None:
+    """Call before importing torch. Caps Apple-GPU memory at a share of what the system recommends, so a
+    job that grows fails with an out-of-memory error instead of pushing the whole machine into swap."""
+    os.environ.setdefault("PYTORCH_MPS_HIGH_WATERMARK_RATIO", share)
+    os.environ.setdefault("PYTORCH_MPS_LOW_WATERMARK_RATIO", "0.2")
+
+
 def torch_device() -> str:
     """Device for the local detectors: DETECTEVAL_DEVICE if set, else Apple GPU, CUDA or CPU."""
     import torch

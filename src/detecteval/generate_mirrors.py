@@ -9,7 +9,8 @@ training" from "generators never seen".
     python -m detecteval.generate_mirrors --shard 0 --of 3     # run the shards in parallel
     python -m detecteval.generate_mirrors --merge
 
-Shards append to data/mirrors/shard-<n>.jsonl; --merge writes data/train_mirrors.jsonl.
+Shards append to data/mirrors/shard-<n>.jsonl (working files, not kept in Git); --merge folds them into
+data/train_mirrors.jsonl. Titles already in either place are skipped, so an interrupted run can continue.
 """
 from __future__ import annotations
 
@@ -79,23 +80,21 @@ def main() -> None:
     parser.add_argument("--merge", action="store_true")
     args = parser.parse_args()
     directory = config.DATA_DIR / "mirrors"
-    if args.merge:
-        rows = {}
-        for path in sorted(directory.glob("shard-*.jsonl")):
+    merged = config.DATA_DIR / "train_mirrors.jsonl"
+    rows = {}
+    for path in [merged, *sorted(directory.glob("shard-*.jsonl"))]:
+        if path.exists():
             with open(path) as handle:
                 rows.update((row["id"], row) for row in map(json.loads, handle))
-        with open(config.DATA_DIR / "train_mirrors.jsonl", "w") as handle:
+    if args.merge:
+        with open(merged, "w") as handle:
             for key in sorted(rows):
                 handle.write(json.dumps(rows[key], ensure_ascii=False) + "\n")
         print("merged", len(rows))
         return
     config.load_env()
     directory.mkdir(parents=True, exist_ok=True)
-    finished = set()
-    for path in directory.glob("shard-*.jsonl"):
-        with open(path) as handle:
-            finished |= {json.loads(line)["id"] for line in handle}
-    mine = [job for n, job in enumerate(jobs(config.SEED)) if n % args.of == args.shard and job["id"] not in finished]
+    mine = [job for n, job in enumerate(jobs(config.SEED)) if n % args.of == args.shard and job["id"] not in rows]
     run_jobs(WorkersAI(), mine, directory / f"shard-{args.shard}.jsonl", "generator", MAX_TOKENS, BATCH, NO_REASONING)
 
 

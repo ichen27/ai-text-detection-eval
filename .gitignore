@@ -7,3 +7,5 @@ __pycache__/
 .env
 # Raw third-party downloads stay outside the repository; see data/README.md.
 raw/
+# Working files of generate_mirrors; the merged result is data/train_mirrors.jsonl.
+data/mirrors/
