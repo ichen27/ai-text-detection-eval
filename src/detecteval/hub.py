@@ -73,14 +73,17 @@ _RUN_BATCH_JS = """async () => {
   const items = %(items)s;
   const out = new Array(items.length);
   let next = 0;
+  const limit = (promise, ms) => Promise.race([promise,
+    new Promise((_, reject) => setTimeout(() => reject(new Error("item timed out")), ms))]);
   async function worker() {
     while (next < items.length) {
       const i = next++;
+      const started = Date.now();
       try {
-        const r = await cloudflare.request({method: "POST",
-          path: `/accounts/${accountId}/ai/run/${items[i].model}`, body: items[i].body});
-        out[i] = {ok: true, result: r.result};
-      } catch (e) { out[i] = {ok: false, error: String(e).slice(0, 500)}; }
+        const r = await limit(cloudflare.request({method: "POST",
+          path: `/accounts/${accountId}/ai/run/${items[i].model}`, body: items[i].body}), %(item_timeout_ms)d);
+        out[i] = {ok: true, result: r.result, ms: Date.now() - started};
+      } catch (e) { out[i] = {ok: false, error: String(e).slice(0, 500), ms: Date.now() - started}; }
     }
   }
   await Promise.all(Array.from({length: %(concurrency)d}, worker));
@@ -94,9 +97,13 @@ class WorkersAI:
     def __init__(self, client: McpClient | None = None):
         self.client = client or McpClient()
 
-    def run_batch(self, items: list[dict], concurrency: int = 4, retries: int = 2) -> list[dict]:
+    def run_batch(self, items: list[dict], concurrency: int = 4, retries: int = 2,
+                  item_timeout: float = 50) -> list[dict]:
         """``items`` are ``{"model": "@cf/...", "body": {...}}``. Returns one ``{"ok", "result"|"error"}``
-        per item, in order. Items that fail are retried ``retries`` times."""
+        per item, in order. Items that fail are retried ``retries`` times.
+
+        A gateway may end the whole call after about a minute, which would lose every item in it, so
+        each item is abandoned after ``item_timeout`` seconds and reported as failed on its own."""
         results: list[dict | None] = [None] * len(items)
         pending = list(range(len(items)))
         for attempt in range(retries + 1):
@@ -104,7 +111,8 @@ class WorkersAI:
                 break
             if attempt:
                 time.sleep(2 * attempt)
-            code = _RUN_BATCH_JS % {"items": json.dumps([items[i] for i in pending]), "concurrency": concurrency}
+            code = _RUN_BATCH_JS % {"items": json.dumps([items[i] for i in pending]), "concurrency": concurrency,
+                                    "item_timeout_ms": int(item_timeout * 1000)}
             try:
                 batch = json.loads(self.client.call_tool("execute", {"code": code, "truncate": False}))
                 if not isinstance(batch, list) or len(batch) != len(pending):

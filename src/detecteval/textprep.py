@@ -1,6 +1,7 @@
 """Normalise and trim texts so every group is compared at a similar length and layout."""
 from __future__ import annotations
 
+import html
 import re
 
 _SENTENCE_END = re.compile(r"[.!?][\"')\]]?$")
@@ -40,3 +41,20 @@ def trim_words(text: str, max_words: int = 150, min_words: int = 60) -> str | No
         if _SENTENCE_END.search(window[end - 1]):
             return " ".join(window[:end])
     return " ".join(window)
+
+
+def rung_text(text: str, rung: int, fill: float = 0.85) -> str | None:
+    """The text cut to one length rung, or None when it is too short to represent that rung."""
+    return trim_words(text, rung, max(1, int(rung * fill)))
+
+
+_DROP_BLOCKS = re.compile(r"<(pre|blockquote|table)\b.*?</\1>", re.DOTALL | re.IGNORECASE)
+_BREAKS = re.compile(r"</(p|li|h\d|div)>|<br\s*/?>", re.IGNORECASE)
+_TAGS = re.compile(r"<[^>]+>")
+
+
+def html_to_text(body: str) -> str:
+    """Plain prose from a forum post body: code, quotes and tables removed, tags stripped, entities decoded."""
+    body = _DROP_BLOCKS.sub(" ", body)
+    body = _BREAKS.sub("\n", body)
+    return html.unescape(_TAGS.sub("", body)).strip()

@@ -1,5 +1,6 @@
 import pytest
 
+from detecteval import textprep
 from detecteval.textprep import normalise, strip_markdown, trim_words
 
 
@@ -49,3 +50,15 @@ def test_strip_preamble():
 
     assert strip_preamble("Here is the rewritten text:\nActual body.") == "Actual body."
     assert strip_preamble("Here the river bends.\nSecond line.") == "Here the river bends.\nSecond line."
+
+
+def test_rung_text_needs_most_of_the_rung():
+    text = " ".join(f"w{n}." for n in range(100))
+    assert len(textprep.rung_text(text, 75).split()) == 75
+    assert textprep.rung_text(text, 150) is None          # 100 words cannot stand for a 150-word rung
+    assert len(textprep.rung_text(text, 110).split()) == 100
+
+
+def test_html_to_text_drops_code_and_quotes():
+    body = "<p>I tried &amp; failed.</p><pre><code>x = 1</code></pre><blockquote><p>quoted</p></blockquote><p>Why?</p>"
+    assert textprep.normalise(textprep.html_to_text(body)) == "I tried & failed. Why?"

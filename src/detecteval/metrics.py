@@ -61,3 +61,50 @@ def expected_calibration_error(scores: np.ndarray, labels: np.ndarray, bins: int
     total = len(scores)
     return float(sum(row["n"] / total * abs(row["mean_score"] - row["share_ai"])
                      for row in calibration(scores, labels, bins) if row["n"]))
+
+
+def held_out_rates(calib_human: np.ndarray, test_human: np.ndarray, test_ai: np.ndarray, fpr: float) -> dict:
+    """Set the threshold on one group of human texts and measure on texts it has not seen.
+
+    Returns the threshold, the share of test AI texts flagged, and the share of test human texts
+    flagged (which can differ from the target ``fpr``; that gap is the point of holding texts out)."""
+    threshold = threshold_for_fpr(calib_human, fpr)
+    return {"threshold": threshold, "tpr": flag_rate(test_ai, threshold), "fpr": flag_rate(test_human, threshold)}
+
+
+def fit_logistic(features: np.ndarray, labels: np.ndarray, l2: float = 1.0, iterations: int = 100) -> dict:
+    """L2-regularised logistic regression by Newton's method on standardised features."""
+    features, labels = np.asarray(features, float), np.asarray(labels, float)
+    if features.ndim != 2 or features.shape[0] != labels.shape[0] or len(set(labels.tolist())) < 2:
+        raise ValueError("need a 2-D feature matrix and labels containing both classes")
+    mean, scale = features.mean(axis=0), features.std(axis=0)
+    scale = np.where(scale > 0, scale, 1.0)
+    design = np.hstack([np.ones((features.shape[0], 1)), (features - mean) / scale])
+    penalty = l2 * np.eye(design.shape[1])
+    penalty[0, 0] = 0.0                      # the intercept is not penalised
+    weights = np.zeros(design.shape[1])
+    for _ in range(iterations):
+        p = 1 / (1 + np.exp(-np.clip(design @ weights, -30, 30)))
+        gradient = design.T @ (p - labels) + penalty @ weights
+        hessian = (design * (p * (1 - p))[:, None]).T @ design + penalty
+        step = np.linalg.solve(hessian, gradient)
+        weights -= step
+        if np.abs(step).max() < 1e-8:
+            break
+    return {"mean": mean, "scale": scale, "weights": weights}
+
+
+def predict_logistic(model: dict, features: np.ndarray) -> np.ndarray:
+    """Log-odds of the positive class for each row."""
+    features = (np.asarray(features, float) - model["mean"]) / model["scale"]
+    return model["weights"][0] + features @ model["weights"][1:]
+
+
+def wilson_interval(flagged: int, total: int, z: float = 1.96) -> tuple[float, float]:
+    """95% Wilson score interval for a proportion; (0, 1) when there is no data."""
+    if total == 0:
+        return 0.0, 1.0
+    p = flagged / total
+    centre = (p + z * z / (2 * total)) / (1 + z * z / total)
+    half = z * np.sqrt(p * (1 - p) / total + z * z / (4 * total * total)) / (1 + z * z / total)
+    return float(max(0.0, centre - half)), float(min(1.0, centre + half))

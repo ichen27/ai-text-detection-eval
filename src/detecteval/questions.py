@@ -27,11 +27,17 @@ QUESTIONS = {
 }
 
 
+def score_of(question: str, answer: dict) -> float:
+    """One answer as a 0-1 score (higher = more likely AI)."""
+    if question == "ai_yes":
+        return float(answer["noul"])
+    if question == "author":
+        return float(answer["probabilities"]["ai"])
+    if question == "pct_ai":
+        return float(answer["score"]) / (len(QUESTIONS["pct_ai"]["criteria"]) - 1)
+    raise KeyError(question)
+
+
 def to_scores(answers: dict) -> dict[str, float]:
-    """Map a Clef ``answers`` object to one 0-1 score per question (higher = more likely AI)."""
-    top_level = len(QUESTIONS["pct_ai"]["criteria"]) - 1
-    return {
-        "ai_yes": float(answers["ai_yes"]["noul"]),
-        "author": float(answers["author"]["probabilities"]["ai"]),
-        "pct_ai": float(answers["pct_ai"]["score"]) / top_level,
-    }
+    """Map a Clef ``answers`` object to one 0-1 score per question."""
+    return {question: score_of(question, answers[question]) for question in QUESTIONS}
