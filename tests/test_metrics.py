@@ -56,3 +56,35 @@ def test_bootstrap_interval_brackets_point_estimate():
 def test_empty_groups_rejected():
     with pytest.raises(ValueError):
         metrics.auroc([], [0.5])
+
+
+def test_held_out_rates_use_the_calibration_threshold():
+    calib = np.arange(100) / 100          # 5% FPR threshold is the 6th largest value, 0.94
+    rates = metrics.held_out_rates(calib, np.array([0.1, 0.5, 0.95, 0.99]), np.array([0.9, 0.96, 0.97, 0.2]), 0.05)
+    assert rates["threshold"] == pytest.approx(0.94)
+    assert rates["fpr"] == pytest.approx(0.5)
+    assert rates["tpr"] == pytest.approx(0.5)
+
+
+def test_logistic_regression_separates_and_ignores_noise():
+    rng = np.random.default_rng(0)
+    labels = np.repeat([0, 1], 200)
+    signal = labels * 2.0 + rng.normal(size=400)
+    noise = rng.normal(size=400)
+    model = metrics.fit_logistic(np.column_stack([signal, noise]), labels)
+    scores = metrics.predict_logistic(model, np.column_stack([signal, noise]))
+    assert metrics.auroc(scores[labels == 0], scores[labels == 1]) > 0.9
+    assert abs(model["weights"][1]) > 5 * abs(model["weights"][2])
+
+
+def test_logistic_regression_rejects_one_class():
+    with pytest.raises(ValueError):
+        metrics.fit_logistic(np.zeros((4, 1)), np.zeros(4))
+
+
+def test_wilson_interval_contains_the_estimate_and_narrows():
+    low, high = metrics.wilson_interval(5, 100)
+    assert low < 0.05 < high
+    wide = metrics.wilson_interval(1, 20)
+    assert (high - low) < (wide[1] - wide[0])
+    assert metrics.wilson_interval(0, 0) == (0.0, 1.0)

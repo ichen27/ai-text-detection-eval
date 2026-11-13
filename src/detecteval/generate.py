@@ -72,26 +72,29 @@ def extract_text(result: dict) -> str:
     return (content or "").strip()
 
 
-def run_jobs(workers: WorkersAI, jobs: list[dict], path, model_key: str) -> None:
+def run_jobs(workers: WorkersAI, jobs: list[dict], path, model_key: str, max_tokens: int = MAX_TOKENS,
+             batch: int = BATCH, extra_body: dict[str, dict] | None = None) -> None:
+    """Run chat jobs and append usable outputs to ``path``. ``extra_body`` adds request fields per model."""
     done = set()
     if path.exists():
         with open(path) as handle:
             done = {json.loads(line)["id"] for line in handle}
     todo = [job for job in jobs if job["id"] not in done]
     with open(path, "a") as handle:
-        for start in range(0, len(todo), BATCH):
-            chunk = todo[start:start + BATCH]
+        for start in range(0, len(todo), batch):
+            chunk = todo[start:start + batch]
             items = [{"model": job[model_key], "body": {
                 "messages": [{"role": "user", "content": job["prompt"]}],
-                "max_tokens": MAX_TOKENS, "temperature": 1.0}} for job in chunk]
-            for job, outcome in zip(chunk, workers.run_batch(items, concurrency=BATCH), strict=True):
+                "max_tokens": max_tokens, "temperature": 1.0,
+                **(extra_body or {}).get(job[model_key], {})}} for job in chunk]
+            for job, outcome in zip(chunk, workers.run_batch(items, concurrency=batch), strict=True):
                 text = extract_text(outcome["result"]) if outcome.get("ok") else ""
                 if len(text.split()) < config.MIN_WORDS:
                     print("  no usable text:", job["id"], (outcome.get("error") or "short or empty")[:120])
                     continue
                 handle.write(json.dumps({**job, "text": text}, ensure_ascii=False) + "\n")
             handle.flush()
-            print(f"{min(start + BATCH, len(todo))}/{len(todo)}", flush=True)
+            print(f"{min(start + batch, len(todo))}/{len(todo)}", flush=True)
 
 
 def main() -> None:
