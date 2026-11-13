@@ -53,6 +53,9 @@ uv sync
 bash ci/run.sh        # ruff + pytest; the same entry point CI uses
 ```
 
+`bash ci/run.sh` syncs the default dependency groups, which removes PyTorch from the environment; run
+`uv sync --group ml` again before the local detectors.
+
 Tests cover the metrics, text preparation, half assignment and the detector statistics. They do not call
 any model and do not need PyTorch.
 
