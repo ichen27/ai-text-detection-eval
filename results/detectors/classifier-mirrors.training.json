@@ -1,0 +1,85 @@
+{
+  "recipe": "mirrors",
+  "base_model": "distilbert/distilroberta-base",
+  "started_from": "the saved raid model",
+  "training_examples": 7838,
+  "validation_examples": 324,
+  "epochs": 1.0,
+  "batch": 8,
+  "lr": 2e-05,
+  "max_tokens": 512,
+  "final": {
+    "step": 980,
+    "of": 980,
+    "loss": 0.1845,
+    "minutes": 8.9,
+    "auroc": 0.9924,
+    "accuracy": 0.929
+  },
+  "log": [
+    {
+      "step": 100,
+      "of": 980,
+      "loss": 0.2988,
+      "minutes": 0.9
+    },
+    {
+      "step": 200,
+      "of": 980,
+      "loss": 0.3283,
+      "minutes": 1.8
+    },
+    {
+      "step": 300,
+      "of": 980,
+      "loss": 0.2452,
+      "minutes": 2.7
+    },
+    {
+      "step": 400,
+      "of": 980,
+      "loss": 0.2535,
+      "minutes": 3.6
+    },
+    {
+      "step": 500,
+      "of": 980,
+      "loss": 0.2358,
+      "minutes": 4.5,
+      "auroc": 0.9896,
+      "accuracy": 0.8488
+    },
+    {
+      "step": 600,
+      "of": 980,
+      "loss": 0.2108,
+      "minutes": 5.5
+    },
+    {
+      "step": 700,
+      "of": 980,
+      "loss": 0.1742,
+      "minutes": 6.4
+    },
+    {
+      "step": 800,
+      "of": 980,
+      "loss": 0.1793,
+      "minutes": 7.3
+    },
+    {
+      "step": 900,
+      "of": 980,
+      "loss": 0.1578,
+      "minutes": 8.2
+    },
+    {
+      "step": 980,
+      "of": 980,
+      "loss": 0.1845,
+      "minutes": 8.9,
+      "auroc": 0.9924,
+      "accuracy": 0.929
+    }
+  ]
+}
