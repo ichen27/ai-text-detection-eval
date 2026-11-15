@@ -5,8 +5,8 @@
 | `eval_set.jsonl` | First evaluation set: 836 texts of at most 150 words, already trimmed and normalised. |
 | `generated.jsonl` | Raw model outputs written for the first set (prompt, generator, untrimmed text). |
 | `long_set.jsonl` | Second evaluation set: documents of 300 words or more, kept up to 500 words, so each can be scored at 75, 150, 300 and 500 words. Every text is assigned to a `calib` or `test` half. |
-| `generated_long.jsonl` | Raw model outputs written for the second set. So far fresh texts only (79 of 160); humanized rewrites and polished human texts are planned. |
-| `train_mirrors.jsonl` | Texts written by four current models on the titles of human training documents (264 of 1,000 planned). Used only to train the classifier; never part of an evaluation set. |
+| `generated_long.jsonl` | Raw model outputs written for the second set: 149 fresh texts, 48 humanized rewrites and 60 polished human texts, before trimming. |
+| `train_mirrors.jsonl` | Texts written by four current models on the titles of human training documents (943; 57 of the 1,000 planned requests failed). Used only to train the classifier; never part of an evaluation set. |
 
 ## Fields shared by both evaluation sets
 
@@ -25,7 +25,7 @@
 - `title` — the title the text was written for (empty for essays).
 - `site`, `link`, `author`, `created` — for forum posts: the Stack Exchange site, the post's URL, its
   author's display name and its date. These are the attribution required by CC BY-SA 4.0.
-- `rewritten_from` appears in `generated_long.jsonl`: the id of the text a rewrite started from.
+- `rewritten_from` — for humanized and polished texts, the id of the text the rewrite started from.
 
 A text counts for a length when it has at least 85% of that many words. All documents fill the 75-, 150-
 and 300-word lengths; fewer reach 500 words.
