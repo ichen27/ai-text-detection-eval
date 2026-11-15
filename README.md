@@ -275,11 +275,12 @@ The trained classifier, with Binoculars as an optional second opinion, runs as a
 It has a web page and an MCP endpoint. It does not include Clef, which flagged too much real student
 writing to be shown as a signal. Nothing leaves the machine.
 
-![The detector page with one AI passage and one human passage](docs/screenshots/detector-app.png)
+![The detector page scoring three passages](docs/screenshots/detector-app.png)
 
-A result never says "AI" or "human". For each passage of up to 500 words it gives a band (none, weak,
-moderate, strong) and the numbers behind it: how many human reference texts score at least as high, and
-how many AI reference texts score at most as high. The band follows the stricter human reference.
+For each passage of up to 500 words the result gives a label (Human-like, Slightly AI-like, AI-like,
+Strongly AI-like) and one sentence saying how often human writing scores that high, such as "Only about
+1 in 30 human texts score this high." The label describes the score, not the author, and it follows the
+stricter human reference. The exact rates are one click away under "Show the numbers".
 
 ```sh
 uv sync --group ml --group serve

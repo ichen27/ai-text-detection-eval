@@ -8,12 +8,14 @@
   :root {
     --paper: #eef1f4; --surface: #ffffff; --ink: #16202b; --muted: #5b6673; --rule: #d5dbe2;
     --human: #2a78d6; --ai: #eb6834; --zone-5: #fbe3d6; --zone-1: #f5c3a8; --focus: #16202b;
+    --ai-1: #f3b48f; --ai-2: #eb6834; --ai-3: #b9401a;
     color-scheme: light;
   }
   @media (prefers-color-scheme: dark) {
     :root {
       --paper: #10151b; --surface: #171e26; --ink: #e6eaee; --muted: #9aa6b2; --rule: #2a333d;
       --human: #5b9ae6; --ai: #f0875c; --zone-5: #3b2a22; --zone-1: #5a3524; --focus: #e6eaee;
+      --ai-1: #a8684a; --ai-2: #e0733f; --ai-3: #ff9a66;
       color-scheme: dark;
     }
   }
@@ -47,15 +49,33 @@
   .count { margin-left: auto; color: var(--muted); font-size: 0.875rem; }
   .status { color: var(--muted); font-size: 0.875rem; min-height: 1.4rem; margin-top: 0.6rem; }
   .error { color: var(--ink); background: var(--zone-5); border-left: 3px solid var(--ai); padding: 0.7rem 0.9rem; }
-  .reading { font-size: 1.25rem; line-height: 1.35; font-weight: 600; max-width: 36rem; margin: 0 0 0.25rem; }
-  .passage { border-top: 1px solid var(--rule); padding: 1.25rem 0 0.5rem; }
-  .passage h3 { font-size: 1rem; font-weight: 600; margin: 0; }
-  .start { color: var(--muted); font-size: 0.875rem; margin: 0.15rem 0 0.9rem; }
+  .verdict { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.35rem 1rem; margin: 0 0 0.35rem; }
+  .label { font-size: 1.75rem; line-height: 1.2; font-weight: 600; letter-spacing: -0.01em; margin: 0; }
+  .reading { font-size: 1.0625rem; max-width: 36rem; margin: 0 0 0.9rem; }
+  .map { display: flex; gap: 4px; margin: 0 0 0.4rem; max-width: 36rem; }
+  .map a { flex: 1; height: 1.1rem; border-radius: 3px; }
+  .map-caption { color: var(--muted); font-size: 0.875rem; margin: 0 0 1rem; }
+  [data-band="none"] { --level: var(--human); }
+  [data-band="weak"] { --level: var(--ai-1); }
+  [data-band="moderate"] { --level: var(--ai-2); }
+  [data-band="strong"] { --level: var(--ai-3); }
+  .map a { background: var(--level); }
+  .passage { border-top: 1px solid var(--rule); padding: 1.25rem 0 0.75rem; scroll-margin-top: 1rem; }
+  .passage h3 { font-size: 0.9375rem; font-weight: 400; color: var(--muted); margin: 0 0 0.35rem; }
+  .passage-label { font-size: 1.25rem; font-weight: 600; margin: 0 0 0.15rem; display: flex; align-items: center; gap: 0.55rem; }
+  .dot { flex: none; width: 0.8rem; height: 0.8rem; border-radius: 50%; background: var(--level); }
+  .plain { margin: 0 0 0.6rem; max-width: 36rem; }
+  .meter { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; max-width: 26rem; margin: 0.5rem 0 0.2rem; }
+  .meter span { height: 0.5rem; border-radius: 3px; background: var(--rule); }
+  .meter span.on { background: var(--level); }
+  .meter-ends { display: flex; justify-content: space-between; max-width: 26rem; color: var(--muted); font-size: 0.8125rem; margin-bottom: 0.6rem; }
+  .second { color: var(--muted); margin: 0 0 0.6rem; max-width: 36rem; }
+  .second strong { color: var(--ink); font-weight: 600; }
+  details { margin: 0.35rem 0 0.5rem; }
+  summary { cursor: pointer; color: var(--muted); font-size: 0.9375rem; width: fit-content; }
+  .start { color: var(--muted); font-size: 0.875rem; margin: 0.75rem 0 0.9rem; }
   .detector { margin: 0 0 1.25rem; }
-  .detector-head { display: flex; flex-wrap: wrap; gap: 0.25rem 1rem; justify-content: space-between; }
-  .detector-name { font-weight: 600; }
-  .band { color: var(--muted); }
-  .band[data-band="moderate"], .band[data-band="strong"] { color: var(--ink); font-weight: 600; }
+  .detector-name { font-weight: 600; font-size: 0.9375rem; }
   .track { position: relative; height: 2.6rem; margin: 0.5rem 0 0.2rem; }
   .rail {
     position: absolute; left: 0; right: 0; top: 0.55rem; height: 0.7rem; border-radius: 3px;
@@ -95,8 +115,13 @@
   </form>
 
   <section id="result" hidden aria-live="polite">
-    <h2>Reading</h2>
+    <h2>Result</h2>
+    <p class="label" id="label"></p>
     <p class="reading" id="reading"></p>
+    <div id="overview" hidden>
+      <div class="map" id="map"></div>
+      <p class="map-caption">One block per passage, in order. Blue reads as human-like; deeper orange reads as more AI-like.</p>
+    </div>
     <ul class="notes" id="notes"></ul>
     <div id="passages"></div>
   </section>
@@ -109,12 +134,6 @@
 
 <script>
 const $ = (id) => document.getElementById(id);
-const BAND_TEXT = {
-  none: "In the usual range for human writing",
-  weak: "Slightly unusual for human writing",
-  moderate: "Unusual for human writing",
-  strong: "Very unusual for human writing",
-};
 const DETECTOR_NAME = {"classifier-mirrors": "Trained classifier", "binoculars": "Second opinion (Binoculars)"};
 
 // The track zooms in on the top of the human range, where the decision is made.
@@ -146,7 +165,19 @@ function el(tag, attrs = {}, ...children) {
   return node;
 }
 
-function renderDetector(name, d) {
+const LEVELS = ["none", "weak", "moderate", "strong"];
+
+function meter(band) {
+  const level = LEVELS.indexOf(band);
+  return [
+    el("div", {class: "meter", "data-band": band, role: "img", "aria-label": `Level ${level + 1} of 4`},
+      ...LEVELS.map((_, i) => el("span", i <= level ? {class: "on"} : {}))),
+    el("div", {class: "meter-ends"}, el("span", {}, "Human-like"), el("span", {}, "Strongly AI-like")),
+  ];
+}
+
+// The exact numbers, for anyone who wants to check the label.
+function renderNumbers(name, d) {
   const below = (share) => 100 * (1 - share);
   const shares = d.human_texts_scoring_at_least_this, sizes = d.human_reference_sizes;
   const track = el("div", {class: "track", role: "img",
@@ -166,23 +197,44 @@ function renderDetector(name, d) {
   facts.append(el("li", {}, el("span", {class: "key ai"}),
     `${pct(d.ai_texts_scoring_at_most_this)} of ${d.ai_reference_size} AI texts score this low or lower.`));
   return el("div", {class: "detector"},
-    el("div", {class: "detector-head"},
-      el("span", {class: "detector-name"}, DETECTOR_NAME[name] || name),
-      el("span", {class: "band", "data-band": d.band}, BAND_TEXT[d.band])),
+    el("div", {class: "detector-name"}, `${DETECTOR_NAME[name] || name}: where this passage falls among human texts`),
     track, facts);
 }
 
+function renderPassage(p, many) {
+  const main = p.detectors["classifier-mirrors"], second = p.detectors["binoculars"];
+  const length = p.words <= p.scored_at_words ? `${p.words} words`
+    : `${p.words} words, scored on the first ${p.scored_at_words}`;
+  const parts = [
+    el("h3", {}, many ? `Passage ${p.index}, ${length}` : length),
+    el("p", {class: "passage-label", "data-band": main.band}, el("span", {class: "dot"}), main.label),
+    el("p", {class: "plain"}, main.plain),
+    ...meter(main.band),
+  ];
+  if (second) {
+    const agrees = (second.band === "none") === (main.band === "none");
+    parts.push(el("p", {class: "second"}, "Second opinion: ", el("strong", {}, second.label),
+      agrees ? ", which agrees." : ", which disagrees. Treat this passage as uncertain."));
+  }
+  parts.push(el("details", {},
+    el("summary", {}, "Show the numbers"),
+    el("p", {class: "start"}, `Begins: “${p.start}…”`),
+    ...Object.entries(p.detectors).map(([name, d]) => renderNumbers(name, d))));
+  return el("div", {class: "passage", id: `passage-${p.index}`}, ...parts);
+}
+
 function render(result) {
+  const many = result.passages.length > 1;
+  $("label").textContent = result.summary.label;
   $("reading").textContent = result.summary.reading;
-  $("notes").replaceChildren(...result.notes.map((note) => el("li", {}, note)));
-  $("passages").replaceChildren(...result.passages.map((p) => {
-    const length = p.words <= p.scored_at_words ? `${p.words} words`
-      : `${p.words} words, scored on the first ${p.scored_at_words}`;
-    return el("div", {class: "passage"},
-      el("h3", {}, result.passages.length > 1 ? `Passage ${p.index}, ${length}` : `${length}`),
-      el("p", {class: "start"}, `Begins: “${p.start}…”`),
-      ...Object.entries(p.detectors).map(([name, d]) => renderDetector(name, d)));
+  $("overview").hidden = !many;
+  $("map").replaceChildren(...result.passages.map((p) => {
+    const d = p.detectors["classifier-mirrors"];
+    return el("a", {href: `#passage-${p.index}`, "data-band": d.band, title: `Passage ${p.index}: ${d.label}`,
+      "aria-label": `Passage ${p.index}: ${d.label}`});
   }));
+  $("notes").replaceChildren(...result.notes.map((note) => el("li", {}, note)));
+  $("passages").replaceChildren(...result.passages.map((p) => renderPassage(p, many)));
   $("limits").replaceChildren(...result.limits.map((limit) => el("li", {}, limit)));
   $("result").hidden = false;
 }
