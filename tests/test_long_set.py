@@ -38,3 +38,17 @@ def test_score_of_maps_each_question_to_zero_one():
     assert score_of("ai_yes", {"noul": 0.25}) == 0.25
     assert score_of("author", {"probabilities": {"human": 0.3, "ai": 0.7}}) == 0.7
     assert score_of("pct_ai", {"score": 3.0}) == 0.75
+
+
+def test_private_items_cut_documents_to_the_rungs_they_fill(tmp_path, monkeypatch):
+    from detecteval import items
+
+    monkeypatch.setenv("RAW_DATA_DIR", str(tmp_path))
+    (tmp_path / "private").mkdir()
+    text = " ".join(f"word{n}." for n in range(200))
+    (tmp_path / "private" / "manifest.jsonl").write_text(
+        '{"id": "doc-1", "group": "own_pre_ai", "text": "' + text + '"}\n')
+    found = {item["key"]: item for item in items.private_items()}
+    assert set(found) == {"doc-1@75", "doc-1@150"}          # 200 words cannot stand for 300 or 500
+    assert len(found["doc-1@150"]["text"].split()) == 150
+    assert found["doc-1@75"]["set"] == "private"
