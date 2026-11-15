@@ -277,10 +277,18 @@ writing to be shown as a signal. Nothing leaves the machine.
 
 ![The detector page scoring three passages](docs/screenshots/detector-app.png)
 
-For each passage of up to 500 words the result gives a label (Human-like, Slightly AI-like, AI-like,
-Strongly AI-like) and one sentence saying how often human writing scores that high, such as "Only about
-1 in 30 human texts score this high." The label describes the score, not the author, and it follows the
-stricter human reference. The exact rates are one click away under "Show the numbers".
+For each passage of up to 500 words the result gives an AI likelihood from 1% to 99%, a label that follows
+it (Human-like under 30%, Slightly AI-like, AI-like from 60%, Strongly AI-like from 85%) and one sentence
+saying how often human writing scores that high, such as "Only about 1 in 30 human texts score this
+high." The whole text gets the average, weighted by passage length.
+
+The likelihood is the chance a passage is AI-written if AI and human text were equally likely
+beforehand. It is read off a never-decreasing curve fitted to the reference scores, with the private
+human reference, when present, counting as much as the public one. Fitted on the calibration half and
+checked on the test half at 300 words, passages given 85% or more were AI-written 99% of the time, those
+given 60 to 85% were 72%, 30 to 60% were 39%, and under 30% were 3%. Where most text is human-written the
+real chance is lower than the number shown. The label describes the score, not the author, and the exact
+rates are one click away under "Show the numbers".
 
 ```sh
 uv sync --group ml --group serve

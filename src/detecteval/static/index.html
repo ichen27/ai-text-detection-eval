@@ -50,7 +50,10 @@
   .status { color: var(--muted); font-size: 0.875rem; min-height: 1.4rem; margin-top: 0.6rem; }
   .error { color: var(--ink); background: var(--zone-5); border-left: 3px solid var(--ai); padding: 0.7rem 0.9rem; }
   .verdict { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.35rem 1rem; margin: 0 0 0.35rem; }
-  .label { font-size: 1.75rem; line-height: 1.2; font-weight: 600; letter-spacing: -0.01em; margin: 0; }
+  .headline { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.2rem 0.9rem; margin: 0 0 0.3rem; }
+  .number { font-size: 3.25rem; line-height: 1; font-weight: 600; letter-spacing: -0.02em; }
+  .label { font-size: 1.5rem; line-height: 1.2; font-weight: 600; letter-spacing: -0.01em; }
+  .caption { color: var(--muted); font-size: 0.875rem; margin: 0 0 0.6rem; }
   .reading { font-size: 1.0625rem; max-width: 36rem; margin: 0 0 0.9rem; }
   .map { display: flex; gap: 4px; margin: 0 0 0.4rem; max-width: 36rem; }
   .map a { flex: 1; height: 1.1rem; border-radius: 3px; }
@@ -65,10 +68,10 @@
   .passage-label { font-size: 1.25rem; font-weight: 600; margin: 0 0 0.15rem; display: flex; align-items: center; gap: 0.55rem; }
   .dot { flex: none; width: 0.8rem; height: 0.8rem; border-radius: 50%; background: var(--level); }
   .plain { margin: 0 0 0.6rem; max-width: 36rem; }
-  .meter { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; max-width: 26rem; margin: 0.5rem 0 0.2rem; }
-  .meter span { height: 0.5rem; border-radius: 3px; background: var(--rule); }
-  .meter span.on { background: var(--level); }
-  .meter-ends { display: flex; justify-content: space-between; max-width: 26rem; color: var(--muted); font-size: 0.8125rem; margin-bottom: 0.6rem; }
+  .passage-number { font-variant-numeric: tabular-nums; min-width: 3.2rem; }
+  .bar { position: relative; height: 0.6rem; max-width: 26rem; border-radius: 3px; background: var(--rule); margin: 0.5rem 0 0.2rem; overflow: hidden; }
+  .bar span { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 3px; background: var(--level); }
+  .bar-ends { display: flex; justify-content: space-between; max-width: 26rem; color: var(--muted); font-size: 0.8125rem; margin-bottom: 0.6rem; }
   .second { color: var(--muted); margin: 0 0 0.6rem; max-width: 36rem; }
   .second strong { color: var(--ink); font-weight: 600; }
   details { margin: 0.35rem 0 0.5rem; }
@@ -100,8 +103,8 @@
 <body>
 <main>
   <h1>AI text detector</h1>
-  <p class="lede">Paste writing to see how AI-like it scores, and how often real human writing scores the
-    same. Everything runs on this machine; the text is not sent anywhere.</p>
+  <p class="lede">Paste writing to get an AI likelihood from 1% to 99%, and how often real human writing
+    scores the same. Everything runs on this machine; the text is not sent anywhere.</p>
 
   <form id="form">
     <label for="text">Text to score</label>
@@ -116,7 +119,8 @@
 
   <section id="result" hidden aria-live="polite">
     <h2>Result</h2>
-    <p class="label" id="label"></p>
+    <p class="headline"><span class="number" id="number"></span><span class="label" id="label"></span></p>
+    <p class="caption" id="caption"></p>
     <p class="reading" id="reading"></p>
     <div id="overview" hidden>
       <div class="map" id="map"></div>
@@ -165,14 +169,11 @@ function el(tag, attrs = {}, ...children) {
   return node;
 }
 
-const LEVELS = ["none", "weak", "moderate", "strong"];
-
-function meter(band) {
-  const level = LEVELS.indexOf(band);
+function bar(band, percent) {
   return [
-    el("div", {class: "meter", "data-band": band, role: "img", "aria-label": `Level ${level + 1} of 4`},
-      ...LEVELS.map((_, i) => el("span", i <= level ? {class: "on"} : {}))),
-    el("div", {class: "meter-ends"}, el("span", {}, "Human-like"), el("span", {}, "Strongly AI-like")),
+    el("div", {class: "bar", "data-band": band, role: "img", "aria-label": `AI likelihood ${percent}%`},
+      el("span", {style: `width:${percent}%`})),
+    el("div", {class: "bar-ends"}, el("span", {}, "0%, human-like"), el("span", {}, "100%, AI-like")),
   ];
 }
 
@@ -207,13 +208,15 @@ function renderPassage(p, many) {
     : `${p.words} words, scored on the first ${p.scored_at_words}`;
   const parts = [
     el("h3", {}, many ? `Passage ${p.index}, ${length}` : length),
-    el("p", {class: "passage-label", "data-band": main.band}, el("span", {class: "dot"}), main.label),
+    el("p", {class: "passage-label", "data-band": main.band}, el("span", {class: "dot"}),
+      el("span", {class: "passage-number"}, `${main.ai_likelihood_percent}%`), main.label),
     el("p", {class: "plain"}, main.plain),
-    ...meter(main.band),
+    ...bar(main.band, main.ai_likelihood_percent),
   ];
   if (second) {
-    const agrees = (second.band === "none") === (main.band === "none");
-    parts.push(el("p", {class: "second"}, "Second opinion: ", el("strong", {}, second.label),
+    const agrees = (second.ai_likelihood_percent >= 50) === (main.ai_likelihood_percent >= 50);
+    parts.push(el("p", {class: "second"}, "Second opinion: ",
+      el("strong", {}, `${second.ai_likelihood_percent}%, ${second.label}`),
       agrees ? ", which agrees." : ", which disagrees. Treat this passage as uncertain."));
   }
   parts.push(el("details", {},
@@ -225,13 +228,17 @@ function renderPassage(p, many) {
 
 function render(result) {
   const many = result.passages.length > 1;
+  $("number").textContent = `${result.summary.ai_likelihood_percent}%`;
   $("label").textContent = result.summary.label;
+  $("caption").textContent = many
+    ? `AI likelihood, averaged over ${result.passages.length} passages by length.`
+    : "AI likelihood: the chance this is AI-written, if AI and human text were equally likely beforehand.";
   $("reading").textContent = result.summary.reading;
   $("overview").hidden = !many;
   $("map").replaceChildren(...result.passages.map((p) => {
     const d = p.detectors["classifier-mirrors"];
-    return el("a", {href: `#passage-${p.index}`, "data-band": d.band, title: `Passage ${p.index}: ${d.label}`,
-      "aria-label": `Passage ${p.index}: ${d.label}`});
+    const name = `Passage ${p.index}: ${d.ai_likelihood_percent}%, ${d.label}`;
+    return el("a", {href: `#passage-${p.index}`, "data-band": d.band, title: name, "aria-label": name});
   }));
   $("notes").replaceChildren(...result.notes.map((note) => el("li", {}, note)));
   $("passages").replaceChildren(...result.passages.map((p) => renderPassage(p, many)));

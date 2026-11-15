@@ -77,6 +77,40 @@ def share_at_most(reference: list[float], score: float) -> float | None:
     return bisect.bisect_right(reference, score) / len(reference)
 
 
+def probability_curve(human_sets: list[list[float]], ai: list[float]) -> tuple[list[float], list[float]]:
+    """Score-to-likelihood curve: an isotonic (never decreasing) fit of "is AI" against score.
+
+    Human and AI text carry equal total weight, so the result is the chance a text is AI-written when
+    the two were equally likely beforehand. Several human reference sets share the human weight
+    equally, so a small set of harder human texts counts as much as a large set of easier ones.
+    Returns (scores, likelihoods) to interpolate between."""
+    points = [(score, 1.0, 0.5 / len(ai)) for score in ai]
+    for reference in human_sets:
+        points += [(score, 0.0, 0.5 / len(human_sets) / len(reference)) for score in reference]
+    points.sort()
+    blocks: list[list[float]] = []            # [weighted score sum, weighted label sum, weight]
+    for score, label, weight in points:
+        blocks.append([score * weight, label * weight, weight])
+        while len(blocks) > 1 and blocks[-2][1] / blocks[-2][2] >= blocks[-1][1] / blocks[-1][2]:
+            last = blocks.pop()
+            blocks[-1] = [a + b for a, b in zip(blocks[-1], last, strict=True)]
+    return [block[0] / block[2] for block in blocks], [block[1] / block[2] for block in blocks]
+
+
+def likelihood(curve: tuple[list[float], list[float]], score: float, floor: float = 0.01) -> float:
+    """Likelihood for one score, interpolated along the curve and kept away from 0 and 1."""
+    scores, values = curve
+    if score <= scores[0]:
+        value = values[0]
+    elif score >= scores[-1]:
+        value = values[-1]
+    else:
+        right = bisect.bisect_right(scores, score)
+        span = scores[right] - scores[right - 1]
+        value = values[right - 1] + (values[right] - values[right - 1]) * (score - scores[right - 1]) / span
+    return min(1 - floor, max(floor, value))
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     parser.add_argument("--private", action="store_true", help="also write the private human reference")

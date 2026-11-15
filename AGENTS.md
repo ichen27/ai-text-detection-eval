@@ -66,8 +66,10 @@ registered in the MCP hub as the lazy HTTP backend `ai-detector` (tools prefixed
 - After changing dependencies, redeploy with the launcher's `deploy` command so the build step runs.
 - The service must stay light: models load in the worker on demand and the worker is stopped when idle.
   This machine has restarted from memory exhaustion before; do not make the models resident.
-- Labels describe the score ("AI-like"), never the author ("written by AI"), and every label comes with
-  how often human writing scores that high. Keep the labels tied to the stricter human reference.
+- Labels describe the score ("AI-like"), never the author ("written by AI"), and every result comes with
+  how often human writing scores that high. The percentage is an equal-prior likelihood from
+  `calibration.probability_curve`; keep the private human reference in that curve when it exists, and
+  recheck the held-out calibration figures in the README if the classifier or reference scores change.
 - `results/calibration.json` is derived from committed scores; rebuild it with `calibration` whenever the
   long-set scores or the classifier change. The private reference lives in `RAW_DATA_DIR/private`.
 
