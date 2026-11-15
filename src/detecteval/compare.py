@@ -205,6 +205,10 @@ def analyse() -> dict:
     long_500 = {texts[key]["id"] for key in keys_of(texts, "long", 500, scores, LOCAL)}
     same_docs = [key for key in keys_of(texts, "long", 300, scores, LOCAL) if texts[key]["id"] in long_500]
     out["local_slices"]["long@300 (documents that reach 500 words)"] = evaluate_slice(same_docs, texts, scores, LOCAL)
+    scored_500 = {texts[key]["id"] for key in keys_of(texts, "long", 500, scores)}
+    same_docs = [key for key in keys_of(texts, "long", 300, scores) if texts[key]["id"] in scored_500]
+    out["slices"]["long@300 (documents that reach 500 words)"] = evaluate_slice(same_docs, texts, scores,
+                                                                                list(DETECTORS))
 
     # Does the model treat human text it may have memorised differently from text it cannot have seen?
     keys = keys_of(texts, "long", 300, scores)

@@ -2,84 +2,104 @@
   "recipe": "mirrors",
   "base_model": "distilbert/distilroberta-base",
   "started_from": "the saved raid model",
-  "training_examples": 7838,
-  "validation_examples": 324,
+  "training_examples": 9769,
+  "validation_examples": 430,
   "epochs": 1.0,
   "batch": 8,
   "lr": 2e-05,
   "max_tokens": 512,
   "final": {
-    "step": 980,
-    "of": 980,
-    "loss": 0.1845,
-    "minutes": 8.9,
-    "auroc": 0.9924,
-    "accuracy": 0.929
+    "step": 1222,
+    "of": 1222,
+    "loss": 0.1309,
+    "minutes": 11.9,
+    "auroc": 0.9921,
+    "accuracy": 0.9209
   },
   "log": [
     {
       "step": 100,
-      "of": 980,
-      "loss": 0.2988,
-      "minutes": 0.9
+      "of": 1222,
+      "loss": 0.4518,
+      "minutes": 1.0
     },
     {
       "step": 200,
-      "of": 980,
-      "loss": 0.3283,
-      "minutes": 1.8
+      "of": 1222,
+      "loss": 0.2768,
+      "minutes": 1.9
     },
     {
       "step": 300,
-      "of": 980,
-      "loss": 0.2452,
-      "minutes": 2.7
+      "of": 1222,
+      "loss": 0.2347,
+      "minutes": 2.9
     },
     {
       "step": 400,
-      "of": 980,
-      "loss": 0.2535,
-      "minutes": 3.6
+      "of": 1222,
+      "loss": 0.268,
+      "minutes": 3.8
     },
     {
       "step": 500,
-      "of": 980,
-      "loss": 0.2358,
-      "minutes": 4.5,
-      "auroc": 0.9896,
-      "accuracy": 0.8488
+      "of": 1222,
+      "loss": 0.2274,
+      "minutes": 4.8,
+      "auroc": 0.9877,
+      "accuracy": 0.9233
     },
     {
       "step": 600,
-      "of": 980,
-      "loss": 0.2108,
-      "minutes": 5.5
+      "of": 1222,
+      "loss": 0.2564,
+      "minutes": 5.8
     },
     {
       "step": 700,
-      "of": 980,
-      "loss": 0.1742,
-      "minutes": 6.4
+      "of": 1222,
+      "loss": 0.2331,
+      "minutes": 6.8
     },
     {
       "step": 800,
-      "of": 980,
-      "loss": 0.1793,
-      "minutes": 7.3
+      "of": 1222,
+      "loss": 0.1745,
+      "minutes": 7.7
     },
     {
       "step": 900,
-      "of": 980,
-      "loss": 0.1578,
-      "minutes": 8.2
+      "of": 1222,
+      "loss": 0.2308,
+      "minutes": 8.7
     },
     {
-      "step": 980,
-      "of": 980,
-      "loss": 0.1845,
-      "minutes": 8.9,
-      "auroc": 0.9924,
-      "accuracy": 0.929
+      "step": 1000,
+      "of": 1222,
+      "loss": 0.2374,
+      "minutes": 9.6,
+      "auroc": 0.9917,
+      "accuracy": 0.9209
+    },
+    {
+      "step": 1100,
+      "of": 1222,
+      "loss": 0.1561,
+      "minutes": 10.7
+    },
+    {
+      "step": 1200,
+      "of": 1222,
+      "loss": 0.1341,
+      "minutes": 11.7
+    },
+    {
+      "step": 1222,
+      "of": 1222,
+      "loss": 0.1309,
+      "minutes": 11.9,
+      "auroc": 0.9921,
+      "accuracy": 0.9209
     }
   ]
 }

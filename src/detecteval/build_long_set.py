@@ -164,7 +164,8 @@ def generated_records() -> list[dict]:
     with open(path) as handle:
         for row in map(json.loads, handle):
             label, group = groups[row["kind"]]
-            extra = {"rewriter": row["rewriter"].rsplit("/", 1)[1]} if row["kind"] != "fresh" else {}
+            extra = {} if row["kind"] == "fresh" else {"rewriter": row["rewriter"].rsplit("/", 1)[1],
+                                                       "rewritten_from": row["rewritten_from"]}
             generator = "human" if row["kind"] == "polished" else row["generator"].rsplit("/", 1)[1]
             item = record(row["id"], label, group, strip_preamble(row["text"]), row["source_id"],
                           source="generated for this study", domain=row["domain"], generator=generator,

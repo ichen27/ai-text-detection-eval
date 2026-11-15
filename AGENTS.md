@@ -38,6 +38,8 @@ classifier fine-tuned on examples. It is an evaluation harness, not a detector p
   item its own time limit so one slow item cannot lose the batch; keep single generations under that.
 - A "key" is one text at one length: `<id>@short`, or `<id>@<words>` for the long set. Every detector
   writes one row per key, so `compare` can join them.
+- `generate_long` plans humanized rewrites from the fresh texts that exist when it runs. To retry failed
+  fresh texts later, rerun only the fresh jobs, or the rewrite sample changes.
 - Long-set texts carry a `split`. Set thresholds and fit combinations on `calib`; report on `test`.
 - Training data must never overlap evaluation data. `train_data` excludes every evaluation source
   document, uses separate Stack Exchange sites, and leaves four current generators and all student

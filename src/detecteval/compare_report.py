@@ -98,20 +98,23 @@ def markdown(summary: dict) -> str:
     rungs = [rung for rung in (75, 150, 300) if f"long@{rung}" in slices]
     lines += ladder_table(slices, main, rungs)
     entry = slices["long@300"]
-    lines += ["", f"{entry['n_texts']} of the long set's {entry['n_in_set']} documents have been scored by every "
-              "detector, including Clef. " + (
-                  "The rest are 2026-model texts that Clef has not scored yet, so this table covers human text and "
-                  "2023-era machine text only." if entry["n_texts"] < entry["n_in_set"] else "")]
-    lines += ["", "The detectors that run locally have scored every document, including the 2026-model texts:", ""]
-    lines += ladder_table(local, ["binoculars", "classifier-raid", "classifier-mirrors", "local-two"],
-                          [75, 150, 300])
-    same = local.get("long@300 (documents that reach 500 words)")
-    if same and "long@500" in local:
+    complete = entry["n_texts"] == entry["n_in_set"]
+    local_names = ["binoculars", "classifier-raid", "classifier-mirrors", "local-two"]
+    if complete:
+        lines += ["", f"All {entry['n_in_set']} documents of the long set are included."]
+    else:
+        lines += ["", f"{entry['n_texts']} of the long set's {entry['n_in_set']} documents have been scored by every "
+                  "detector. The rest have not been scored by Clef yet, so the table above leaves them out.", "",
+                  "The detectors that run locally have scored every document:", ""]
+        lines += ladder_table(local, local_names, [75, 150, 300])
+    source, names = (slices, main) if complete else (local, local_names)
+    same = source.get("long@300 (documents that reach 500 words)")
+    if same and same["detectors"] and "long@500" in source:
         lines += ["", f"Going from 300 to 500 words, on the {same['n_texts']} documents long enough for both "
-                  "(mostly human text and 2026-model text):", "", "| Detector | 300 words | 500 words |",
-                  "|---|---|---|"]
-        for name in ["binoculars", "classifier-raid", "classifier-mirrors", "local-two"]:
-            before, after = same["detectors"].get(name), local["long@500"]["detectors"].get(name)
+                  "(human text and 2026-model text; almost no 2023-model text is that long):", "",
+                  "| Detector | 300 words | 500 words |", "|---|---|---|"]
+        for name in names:
+            before, after = same["detectors"].get(name), source["long@500"]["detectors"].get(name)
             if before and after:
                 lines.append(f"| {SHORT_NAMES[name]} | {pct(before['tpr_5pct'])} ({pct(before['fpr_5pct'])}) | "
                              f"{pct(after['tpr_5pct'])} ({pct(after['fpr_5pct'])}) |")
@@ -119,9 +122,9 @@ def markdown(summary: dict) -> str:
     lines += ["", "## 2. All detectors at 300 words", ""] + overall_table(slices["long@300"])
     lines += ["", "Share of each group flagged as AI, bar set for 5% of humans:", ""]
     lines += group_table(slices["long@300"], main)
-    lines += ["", "Local detectors on every 300-word document, including 2026-model texts:", ""]
-    lines += overall_table(local["long@300"]) + [""]
-    lines += group_table(local["long@300"], ["binoculars", "classifier-raid", "classifier-mirrors", "local-two"])
+    if not complete:
+        lines += ["", "Local detectors on every 300-word document:", ""]
+        lines += overall_table(local["long@300"]) + [""] + group_table(local["long@300"], local_names)
 
     lines += ["", "## 3. Human writing the models cannot have seen", "",
               "Forum posts from the same sites: 2019 (possibly in training data) against posts published "
@@ -143,7 +146,10 @@ def markdown(summary: dict) -> str:
               "Share of 2026-model texts flagged, bar set for 5% of humans. \"Seen\" are the four generators that "
               "wrote the training mirrors; the other four never appear in training.", "",
               "Short set:", ""] + generator_table(slices["short@150"])
-    lines += ["", "Long set at 300 words (local detectors):", ""] + generator_table(local["long@300"])
+    if complete:
+        lines += ["", "Long set at 300 words:", ""] + generator_table(slices["long@300"])
+    else:
+        lines += ["", "Long set at 300 words (local detectors):", ""] + generator_table(local["long@300"])
     if summary["polish_effect"]:
         lines += ["", "## 6. Human text polished by a 2026 model", "",
                   "Share of pairs whose score rose after polishing (300 words).", "",
@@ -191,9 +197,8 @@ def figure_ladder(summary: dict, path) -> None:
     ax.set_ylim(0, 105)
     ax.set_ylabel("% of AI texts caught", fontsize=9, color=MUTED)
     entry = summary["slices"]["long@300"]
-    scope = ("human and 2023-model texts" if entry["n_texts"] < entry.get("n_in_set", entry["n_texts"])
-             else "all long-set texts")
-    ax.set_title(f"AI text caught as the same documents get longer ({scope})\nBar set to flag 5% of human texts, "
+    scope = " (texts Clef has scored)" if entry["n_texts"] < entry.get("n_in_set", entry["n_texts"]) else ""
+    ax.set_title(f"AI text caught as the same documents get longer{scope}\nBar set to flag 5% of human texts, "
                  "measured on held-out texts", fontsize=11, color=INK, loc="left")
     fig.tight_layout()
     fig.savefig(path, dpi=160, facecolor=SURFACE)
