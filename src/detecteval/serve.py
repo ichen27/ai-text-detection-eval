@@ -223,11 +223,12 @@ mcp = MCPServer(
 async def detect_ai_text(text: str, use_binoculars: bool = False) -> dict:
     """Score how AI-like a piece of English prose is. Runs locally; the text is not sent anywhere.
 
-    The text is cut into passages of up to 500 words. For each passage the result gives a band
-    (none, weak, moderate, strong) and the share of human reference texts that score at least as high,
-    for public human texts and, when available, one student's private pre-ChatGPT essays. It never says
-    "AI" or "human". Needs at least 63 words; under 150 words it is unreliable. Text a person wrote and
-    an AI then polished usually scores as AI. Set use_binoculars for a slower second opinion.
+    The text is cut into passages of up to 500 words. ``summary.label`` and ``summary.reading`` describe the
+    whole text; each passage has a ``label`` (Human-like, Slightly AI-like, AI-like, Strongly AI-like) and
+    a ``plain`` sentence saying how often human writing scores that high, for example "Only about 1 in 30
+    human texts score this high." Labels describe the score, not the author: report them with that
+    sentence and never as proof. Needs at least 63 words; under 150 words it is unreliable. Text a person
+    wrote and an AI then polished usually scores as AI-like. Set use_binoculars for a slower second opinion.
     """
     try:
         return await detect(text, use_binoculars)

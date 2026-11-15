@@ -61,4 +61,38 @@ def test_result_never_names_a_verdict():
     assert result["ok"] and result["summary"]["bands"]["strong"] == 1
     assert "binoculars" not in result["passages"][0]["detectors"]
     text = str({key: value for key, value in result.items() if key != "limits"}).lower()
-    assert "written by ai" not in text and "is human" not in text
+    assert "written by ai" not in text and "is human" not in text       # labels describe the score, not the author
+    assert result["summary"]["label"] == "Strongly AI-like"
+
+
+@pytest.mark.parametrize(("share", "odds"), [(0.5, 2), (0.034, 30), (0.005, 200), (0.11, 10), (1.0, 2)])
+def test_one_in_gives_round_odds(share, odds):
+    assert detector.one_in(share) == odds
+
+
+def test_plain_reading_says_how_common_the_score_is():
+    assert detector.plain_reading("strong", 0.004, 500, 0.4) == "Only about 1 in 250 human texts score this high."
+    assert detector.plain_reading("weak", 0.12, 500, 0.4) == "About 1 in 8 human texts score this high."
+    assert detector.plain_reading("strong", 0.0, 260, 0.4) == "None of the 260 human reference texts scored this high."
+    human_like = detector.plain_reading("none", 0.6, 500, 0.1)
+    assert human_like.startswith("More than half") and "does not rule AI out" in human_like
+    assert detector.plain_reading("none", 0.6, 500, 0.005).endswith("Few AI texts score this low (about 1 in 200).")
+
+
+def reading(band):
+    return {"detectors": {"classifier-mirrors": {"band": band, "label": detector.LABELS[band], "plain": "x"}}}
+
+
+@pytest.mark.parametrize(("bands", "label"), [
+    (["strong"], "Strongly AI-like"), (["strong", "strong"], "Strongly AI-like"), (["strong", "moderate"], "AI-like"),
+    (["strong", "none"], "Mixed"), (["weak", "none"], "Mostly human-like"), (["none", "none"], "Human-like")])
+def test_summary_label_for_the_whole_text(bands, label):
+    assert detector.summarise([reading(band) for band in bands])["label"] == label
+
+
+def test_summary_sentence_agrees_in_number():
+    def sentence(*bands):
+        return detector.summarise([reading(band) for band in bands])["reading"]
+
+    assert sentence("strong", "none", "weak").startswith("1 of 3 passages reads")
+    assert sentence("strong", "moderate", "none").startswith("2 of 3 passages read ")
