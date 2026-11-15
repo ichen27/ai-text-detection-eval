@@ -11,89 +11,85 @@ of detector on them:
 
 It is an evaluation harness, not a detector. Nothing here should be used to accuse anyone of using AI.
 
-## Results in brief (13 November 2026)
+## Results in brief (15 November 2026)
 
 All numbers below are measured on texts that were not used to set the flagging bar. "AI caught" is the
 share of AI texts flagged when the bar is set so that 5% of human texts would be flagged.
 
-**Short texts (150 words or fewer), including text from 2026 models**
+**Short texts (150 words or fewer)**
 
 | Detector | AUROC | AI caught | Humans actually flagged | AI caught, bar set for 1% |
 |---|---|---|---|---|
 | Clef 27B, asked "what percentage is AI-generated?" | 0.89 | 65% | 5% | 40% |
 | Binoculars (0.5B model pair) | 0.81 | 45% | 2% | 35% |
 | Classifier trained on RAID (2023 models) | 0.88 | 61% | 5% | 33% |
-| Classifier, RAID then updated with 264 current-model "mirrors" | 0.97 | 86% | 6% | 72% |
-| Clef + Binoculars + classifier, combined | 0.97 | 83% | 6% | 63% |
+| Classifier, RAID then updated with 943 current-model "mirrors" | 0.98 | 92% | 8% | 85% |
+| Clef + Binoculars + classifier, combined | 0.99 | 95% | 7% | 71% |
 
-**The same documents at three lengths (human text and 2023-era AI text)**
+**The same 1,003 documents at three lengths**
 
 | Detector | 75 words | 150 words | 300 words |
 |---|---|---|---|
-| Clef 27B, asked | 49% | 59% | 81% |
-| Binoculars | 63% | 78% | 83% |
-| Classifier, RAID only | 74% | 84% | 85% |
-| Classifier, RAID + mirrors | 79% | 89% | 95% |
-| All three combined | 92% | 95% | 98% |
+| Clef 27B, asked | 49% | 59% | 76% |
+| Binoculars | 51% | 69% | 73% |
+| Classifier, RAID only | 60% | 69% | 69% |
+| Classifier, RAID + mirrors | 78% | 85% | 91% |
+| All three combined | 86% | 93% | 95% |
 
 ![AI caught by text length](results/figures/length_ladder.png)
 
 What the comparison shows:
 
-- **Length helps every detector, the asked model most.** Clef goes from 49% caught at 75 words to 81% at
-  300 on the same documents. Going from 300 to 500 words did not help the local detectors further.
+- **Length helps every detector, the asked model most.** Clef goes from 49% caught at 75 words to 76% at
+  300 on the same documents, and from 63% to 74% between 300 and 500 words on the documents that long.
+  The classifier gains little past 300 words (91% to 95%).
 - **Training on examples beats asking, but only with examples from current models.** A classifier trained
-  on 2023-era text catches 29% of 2026-model text in the short set. After a nine-minute update on 264
-  texts from four current models it catches 73%, and 60% of text from four current models it never saw.
-- **Different kinds of detector make different mistakes, so they combine well.** At 300 words on 2023-era
-  text, Clef and Binoculars each catch about 82%; a logistic regression over the two catches 96%. The
+  on 2023-era text catches 29% of 2026-model text in the short set. After a twelve-minute update on 943
+  texts from four current models it catches 84%, and 76% of text from four current models it never saw
+  (88% at 300 words).
+- **Different kinds of detector make different mistakes, so they combine well.** At 300 words Clef catches
+  76% and Binoculars 73%; a logistic regression over the two catches 89%, and over all three 95%. With
+  the bar set for 1% of humans the three together catch 87%, against 50 to 62% for any one alone. The
   three questions put to Clef in the first study did not combine this way, because they are one opinion.
-- **Binoculars with a small model pair misses current models.** It catches 18% of 2026-model text in the
-  short set. The published method uses 7B models; this 0.5B pair is a floor, not a fair ceiling.
-- **The trained classifier is biased against non-native writers; Clef is not, in this sample.** With the bar
-  set for 5% of all humans, the classifier flags 9 of 47 non-native TOEFL essays (19%) and 0 of 48 native
-  student essays. Clef flags 0 of 47 and 1 of 48. This is the bias Liang et al. reported for 2023 detectors.
-- **Edited text still has no clean answer.** The mirror-trained classifier flags 92% of TOEFL essays that a
-  person wrote and GPT-4 polished; Clef flags 65%.
-- **Recent human posts look more AI-like to Clef than 2019 posts do** (12% flagged against 3%; AUROC 0.71
-  between the two groups). On reading, several of the highest-scoring recent posts appear to be written
-  with AI help, so this does not show that Clef has memorised old text. It does mean "human writing
-  published in 2026" is not a clean human sample.
+- **Binoculars with a small model pair is weak on short current-model text.** It catches 18% of
+  2026-model text at 150 words and 66% at 300. The published method uses 7B models; this 0.5B pair is a
+  floor, not a fair ceiling.
+- **A simple "humanizer" halves what the asked model catches at 300 words, and does not fool the
+  classifier.** Clef flags 77% of 2026-model texts and 42% of their humanized rewrites (8 of 19). The
+  mirror-trained classifier flags all 19.
+- **Classifiers lean against non-native writers; Clef did not here.** The RAID-only classifier flags 8 of
+  47 non-native TOEFL essays and 0 of 48 native student essays. After the update it flags 4 and 1. Clef
+  flags 0 and 1. The samples are small, and this is the bias Liang et al. reported for 2023 detectors.
+- **Edited text still has no clean answer, and the detectors disagree about it.** When a 2026 model
+  polishes a human forum post or essay, the classifier flags 24 of 27 and Clef flags 6 of 27, although
+  Clef's score rose for 96% of the pairs.
+- **Recent human posts look more AI-like than 2019 posts** to two unrelated detectors: Clef flags 6 of 52
+  recent posts against 2 of 65 from 2019, the classifier 6 against 1. Several of the highest-scoring
+  recent posts read as written with AI help. So "human writing published in 2026" is not a clean human
+  sample, and this test cannot say whether Clef recognises older text from its training.
+- **The smaller Clef models stay weak with longer text:** 47% (Clef-flash) and 40% (Clef-omni) at 300 words.
 
 Full tables: [results/comparison.md](results/comparison.md) (all detectors) and
 [results/report.md](results/report.md) (first study: three Clef models, three questions).
 Machine-readable: [results/comparison.json](results/comparison.json), [results/summary.json](results/summary.json).
 
-![Share flagged by group, short texts](results/figures/detectors_by_group_short.png)
-
-## What is not finished
-
-The MCP gateway used to reach Workers AI went down partway through the second study, so everything that
-needs a paid Cloudflare call stopped where it was. The local detectors finished.
-
-| Step | State |
-|---|---|
-| Long 2026-model texts (`generate_long`) | 79 of 160 generated; no humanized or polished texts yet |
-| Clef on the long set | done for all human and 2023-era AI documents at 75, 150 and 300 words; not run on the 2026-model documents, so Clef has no 300-word result on current models and no 500-word result |
-| Clef-flash and Clef-omni on the long set | Clef-flash partly scored and left out of the comparison; Clef-omni not started |
-| Training mirrors (`generate_mirrors`) | 264 of 1,000 generated; the classifier update used those 264 |
-
-Every one of those steps resumes where it stopped: rerun the commands in "Reproduce" and finished items
-are skipped. Then rerun `train_classifier mirrors`, `classify`, `binoculars` and `compare`.
+![Share flagged by group, 300-word texts](results/figures/detectors_by_group_300_words.png)
 
 ## Read this before trusting the numbers
 
-- **Small test halves.** Each number rests on roughly 170 to 260 human and 110 to 180 AI texts. Group
-  rows rest on 20 to 110 texts, and the seen/unseen generator comparison on about 25 each. Intervals are
-  in the full tables.
+- **Small test halves.** Each number rests on roughly 170 to 260 human and 180 to 190 AI texts. Group
+  rows rest on about 20 to 110 texts, and the seen/unseen generator comparison on 24 to 34 each.
+  Intervals are in the full tables.
 - **A 1% bar is set by two or three texts.** The "bar set for 1%" columns are indicative only.
+- **The bar does not always hold.** Set for 5% of calibration humans, the updated classifier flagged 8% of
+  test humans in the short set, mostly RAID documents.
 - **Human writing the models cannot have seen is still missing.** Recent forum posts were meant to fill
   that gap and turned out to include AI-assisted writing. Private writing that has never been online
   remains the clean test, and none was used.
 - **The classifier's test is easier than real use.** Its human training text comes from the same seven
   RAID domains as much of the test set (different documents), and its mirrors use the same prompt style as
   the 2026 test texts. Student essays and the evaluation forum sites were kept out of training.
-- **The classifier reads at most 512 tokens**, about 380 words, so it cannot gain from longer texts.
+- **The classifier reads at most 512 tokens**, about 380 words, so it sees only the start of a 500-word text.
 - **Binoculars runs on a 0.5B model pair** to fit in memory, far smaller than the published 7B pair.
 - **The humanizer is one prompt**, not a commercial humanizer tool. Real tools may evade detection more.
 - **Combination weights were fitted on a few hundred texts** and would need refitting for other text.
@@ -101,8 +97,10 @@ are skipped. Then rerun `train_classifier mirrors`, `classify`, `binoculars` and
   wrong for a population that is mostly human.
 - **Native essays were edited.** Their anonymisation tokens (`@CAPS1`, `@LOCATION2`) were replaced with
   plain fillers so the tokens could not mark them as corpus text.
-- **Hidden reasoning was switched off for four generators** when writing the long texts, to stay inside
-  the gateway's 60-second request limit. Their short-set texts were written with it on.
+- **Hidden reasoning was switched off for four generators** when writing the long texts and the mirrors,
+  to stay inside the gateway's 60-second request limit. Their short-set texts were written with it on.
+- **One generator is under-represented.** GLM 5.3 failed many of its requests, so it wrote 10 of the 20
+  long texts planned for it and 193 of its 250 mirrors.
 - **OpenAI's Decisions endpoint and TypeSafe AI's Jev were not tested.** The first returned HTTP 429 on
   every inference call from the account used; the second is not on Workers AI.
 
@@ -134,10 +132,9 @@ length is measured on the same documents rather than on different ones.
 | human | `forum_2019` | 120 | Questions from the same sites and weeks of 2019 |
 | ai | `raid_2023` | 166 | RAID generations from six 2023-era chat models |
 | ai | `raid_paraphrased` | 64 | RAID generations after its paraphrase attack (books and news) |
-| ai | `fresh_2026` | 78 | Generated for this study by eight current Workers AI models; about half of the 160 planned |
-
-Planned and not yet in the set: humanized rewrites of the 2026 texts, human texts polished by a model, and
-machine-written forum posts and student essays. See "What is not finished" above.
+| ai | `fresh_2026` | 148 | Generated for this study by eight current Workers AI models, in the RAID genres plus forum questions and student essays |
+| ai | `humanized_2026` | 47 | Some of those, rewritten by a second model to "sound like a person" |
+| mixed | `polished_2026` | 56 | Human forum posts and student essays tidied by a current model |
 
 Human and AI texts share source titles where a title exists, so topics match. Every text is stripped of
 chat markdown and collapsed to single spaces. Field descriptions are in [data/README.md](data/README.md).
@@ -211,7 +208,7 @@ uv run python -m detecteval.score_long clef-flash clef-omni --question author --
 
 uv sync --group ml                                 # PyTorch and Transformers for the local detectors
 uv run python -m detecteval.binoculars
-uv run python -m detecteval.generate_mirrors --shard 0 --of 1     # paid: 1,000 training texts
+uv run python -m detecteval.generate_mirrors --shard 0 --of 1     # paid: about 1,000 training texts
 uv run python -m detecteval.generate_mirrors --merge
 uv run python -m detecteval.train_classifier raid
 uv run python -m detecteval.train_classifier mirrors
@@ -231,10 +228,11 @@ same, but that path was not run.
 ### Cost
 
 Paid calls go to Workers AI. The first study's committed scores account for about 4 million input tokens
-(roughly 0.60 US dollars at list prices). The second study so far adds about 1.6 million input tokens of
-Clef scoring (about 0.30 dollars) and 343 generated texts. With discarded trial runs the whole project is
-estimated at 2 to 5 dollars. This is an estimate, not a bill. Binoculars and the classifier run locally:
-about 20 minutes and 55 minutes on an Apple M4, using 3 to 5 GB of memory.
+(roughly 0.60 US dollars at list prices). The second study adds about 3.2 million input tokens of Clef
+scoring (about 0.55 dollars) and 1,200 generated texts of about 340 words each. With discarded trial runs
+and failed requests the whole project is estimated at 3 to 8 dollars. This is an estimate, not a bill.
+Binoculars and the classifier run locally: about 30 minutes and 60 minutes on an Apple M4, using 3 to
+5 GB of memory.
 
 ## Artifacts
 
@@ -245,10 +243,10 @@ about 20 minutes and 55 minutes on an Apple M4, using 3 to 5 GB of memory.
 | Scores per detector | [results/scores/](results/scores/), [results/scores_long/](results/scores_long/), [results/detectors/](results/detectors/) | JSON Lines | `score`, `score_long`, `binoculars`, `classify` |
 | Reports | [results/report.md](results/report.md), [results/comparison.md](results/comparison.md), with `.json` twins | Markdown, JSON | `report`, `compare` |
 | Figures | [results/figures/](results/figures/) | PNG | `report`, `compare` |
-| Trained classifiers (2 × 306 MB) | [release v0.2.0](https://github.com/ichen27/ai-text-detection-eval/releases/tag/v0.2.0) | Hugging Face model folders, gzipped tar | Extract into `RAW_DATA_DIR/models/`, then `python -m detecteval.classify raid mirrors`; or retrain with `train_classifier` |
+| Trained classifiers (2 × 306 MB) | [release v0.3.0](https://github.com/ichen27/ai-text-detection-eval/releases/tag/v0.3.0) | Hugging Face model folders, gzipped tar | Extract into `RAW_DATA_DIR/models/`, then `python -m detecteval.classify raid mirrors`; or retrain with `train_classifier` |
 
 SHA-256 of the release files: `classifier-raid.tar.gz` `81ae99d8aa214fe596a5799cac1b5a19c8f67da5989284e9639a3431d535a9f5`,
-`classifier-mirrors.tar.gz` `796710924d893414557d895c9cb5b0a2b225d7cacc12686413625885ac621262`.
+`classifier-mirrors.tar.gz` `84b41fcb72116e3a19c03e13c670aeccfc1a08f0184dead8b409ab02825b9d0e`.
 
 Raw third-party downloads are not redistributed; [data/README.md](data/README.md) lists the commands that
 fetch them.
