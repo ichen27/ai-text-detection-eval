@@ -16,6 +16,10 @@ It is an evaluation harness, not a detector. Nothing here should be used to accu
 All numbers below are measured on texts that were not used to set the flagging bar. "AI caught" is the
 share of AI texts flagged when the bar is set so that 5% of human texts would be flagged.
 
+**Read the next section with these tables.** The "humans flagged" figures here hold for the public human
+texts in the test sets. On one student's private, pre-ChatGPT school writing the asked model flagged 42%,
+not 5%, and the combinations that include it broke the same way.
+
 **Short texts (150 words or fewer)**
 
 | Detector | AUROC | AI caught | Humans actually flagged | AI caught, bar set for 1% |
@@ -75,6 +79,44 @@ Machine-readable: [results/comparison.json](results/comparison.json), [results/s
 
 ![Share flagged by group, 300-word texts](results/figures/detectors_by_group_300_words.png)
 
+## False accusations on private, pre-ChatGPT writing
+
+The public human texts above may be in the models' training data, and they are not the kind of writing
+detectors are mostly used on. So the detectors were also run on one student's private Google Docs, with
+the flagging bar left exactly where the public data put it (5% of public human texts). 300-word passages:
+
+| Detector | Public human texts | Private, dated before 30 Nov 2022 | Private school work, undated | Private journal, 2024 | Private, dated since (AI use unknown) |
+|---|---|---|---|---|---|
+| Clef 27B, asked | 5% | 42% (21 of 50) | 31% (20 of 65) | not run | 50% (42 of 84) |
+| Binoculars (0.5B pair) | 4% | 4% (2 of 50) | 6% (4 of 65) | 2% (1 of 65) | 19% (16 of 84) |
+| Classifier, RAID only | 3% | 6% (3 of 50) | 12% (8 of 65) | 2% (1 of 65) | 32% (27 of 84) |
+| Classifier, RAID + mirrors | 3% | 8% (4 of 50) | 6% (4 of 65) | 3% (2 of 65) | 48% (40 of 84) |
+| Binoculars + classifier | 6% | 22% (11 of 50) | 11% (7 of 65) | 2% (1 of 65) | 57% (48 of 84) |
+| Clef + Binoculars | 5% | 64% (32 of 50) | 43% (28 of 65) | not run | 76% (64 of 84) |
+| All three combined | 5% | 44% (22 of 50) | 29% (19 of 65) | not run | 77% (65 of 84) |
+
+- **Asking Clef is not safe on real student essays.** It flagged 21 of 50 passages (15 of 29 documents)
+  written between 2019 and November 2022, eight times the rate the public data suggested. Passages from
+  2020 were flagged as often as later ones, so this is not hidden AI use.
+- **The trained classifier and Binoculars roughly held their bar** on the same passages (8% and 4%), and
+  on an informal journal (2 to 3%).
+- **The combinations did not.** Their weights were fitted on public human text, where this writer's essays
+  would have looked unusual: the classifier's typical score for these essays sits far closer to AI text
+  than public human text does, although mostly under the bar. Stacking detectors amplified that.
+- **The classifier, not Clef, tells this writer's older work from recent work.** The writer says much of
+  the recent work was AI-written or AI-revised. The classifier flags 48% of it against 8% of the older
+  work (AUROC 0.78 between the two); Clef flags 50% against 42% (AUROC 0.59).
+- **Re-setting the bar on these essays costs the classifier little.** With the bar moved to flag 5% of the
+  pre-ChatGPT passages, it still catches 85% of AI text at 300 words (91% before); Clef drops from 76% to
+  65% and its AUROC against this human writing is 0.77, against 0.94 for public human text.
+
+What this does and does not show: it is one writer, mostly high-school literary essays; long documents
+were cut into passages, which are not independent; and it cannot say whether Clef recognises the public
+texts from training or simply finds formal school essays AI-like. Either way, a bar set on public human
+text does not transfer to the writing detectors are used on. The texts, titles and per-document scores are
+kept out of this repository; [results/private_writing.md](results/private_writing.md) has the full tables
+at every length.
+
 ## Read this before trusting the numbers
 
 - **Small test halves.** Each number rests on roughly 170 to 260 human and 180 to 190 AI texts. Group
@@ -83,9 +125,11 @@ Machine-readable: [results/comparison.json](results/comparison.json), [results/s
 - **A 1% bar is set by two or three texts.** The "bar set for 1%" columns are indicative only.
 - **The bar does not always hold.** Set for 5% of calibration humans, the updated classifier flagged 8% of
   test humans in the short set, mostly RAID documents.
-- **Human writing the models cannot have seen is still missing.** Recent forum posts were meant to fill
-  that gap and turned out to include AI-assisted writing. Private writing that has never been online
-  remains the clean test, and none was used.
+- **Private human writing was tested for one writer only.** Recent forum posts turned out to include
+  AI-assisted writing, so the clean test is the private-writing section above. It covers a single
+  student's school work; other writers and other genres may behave differently.
+- **The combined detectors are fitted to public human text.** They should be refitted with realistic
+  private human writing in the calibration data before any use.
 - **The classifier's test is easier than real use.** Its human training text comes from the same seven
   RAID domains as much of the test set (different documents), and its mirrors use the same prompt style as
   the 2026 test texts. Student essays and the evaluation forum sites were kept out of training.
@@ -234,7 +278,7 @@ they cannot be in any model's training data and cannot be AI-assisted.
    `{"id": "doc-001", "group": "own_pre_ai", "text": "..."}`. `group` is free text; use one group for
    writing you are sure is unassisted and another for anything else.
 2. `uv run python -m detecteval.private_eval clef` (paid; sends each text to Clef on your Workers AI
-   account), then `uv run python -m detecteval.private_eval local` (needs `uv sync --group ml` and the
+   account; add `--skip-group NAME` to keep a group on your machine), then `uv run python -m detecteval.private_eval local` (needs `uv sync --group ml` and the
    trained classifiers).
 3. `uv run python -m detecteval.private_eval report` writes `results/private_writing.md`.
 
@@ -258,7 +302,7 @@ Binoculars and the classifier run locally: about 30 minutes and 60 minutes on an
 | Both evaluation sets | [data/eval_set.jsonl](data/eval_set.jsonl), [data/long_set.jsonl](data/long_set.jsonl) | JSON Lines | Fields in [data/README.md](data/README.md) |
 | Generated texts and training mirrors | [data/](data/) | JSON Lines | `generate`, `generate_long`, `generate_mirrors` |
 | Scores per detector | [results/scores/](results/scores/), [results/scores_long/](results/scores_long/), [results/detectors/](results/detectors/) | JSON Lines | `score`, `score_long`, `binoculars`, `classify` |
-| Reports | [results/report.md](results/report.md), [results/comparison.md](results/comparison.md), with `.json` twins | Markdown, JSON | `report`, `compare` |
+| Reports | [results/report.md](results/report.md), [results/comparison.md](results/comparison.md), [results/private_writing.md](results/private_writing.md), with `.json` twins | Markdown, JSON | `report`, `compare`, `private_eval report` |
 | Figures | [results/figures/](results/figures/) | PNG | `report`, `compare` |
 | Trained classifiers (2 × 306 MB) | [release v0.3.0](https://github.com/ichen27/ai-text-detection-eval/releases/tag/v0.3.0) | Hugging Face model folders, gzipped tar | Extract into `RAW_DATA_DIR/models/`, then `python -m detecteval.classify raid mirrors`; or retrain with `train_classifier` |
 
@@ -275,6 +319,7 @@ src/detecteval/   pipeline modules (see AGENTS.md for which belongs to which stu
 data/             both evaluation sets, the texts generated for them, training mirrors
 results/          report.md, summary.json      first study
                   comparison.md, comparison.json   all detectors on held-out halves
+                  private_writing.md, .json        false accusations on private writing (aggregates only)
                   scores/, scores_long/, detectors/   raw scores per detector
                   figures/
 tests/            unit tests for metrics, text preparation, splits and detector statistics

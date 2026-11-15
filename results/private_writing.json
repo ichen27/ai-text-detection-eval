@@ -1,0 +1,1627 @@
+{
+ "target_fpr": 0.05,
+ "passages": {
+  "own_pre_ai": 60,
+  "own_recent": 99,
+  "own_school_undated": 82,
+  "own_journal_2024": 66
+ },
+ "documents": {
+  "own_journal_2024": 1,
+  "own_pre_ai": 32,
+  "own_school_undated": 59,
+  "own_recent": 61
+ },
+ "rungs": {
+  "75": {
+   "clef": {
+    "public_test_humans": {
+     "n": 263,
+     "flagged": 19,
+     "share": 0.07224334600760456,
+     "ci95": [
+      0.04673388801633136,
+      0.11006924912570343
+     ]
+    },
+    "groups": {
+     "own_pre_ai": {
+      "n": 60,
+      "flagged": 19,
+      "share": 0.31666666666666665,
+      "ci95": [
+       0.21305705841174333,
+       0.4423400494301654
+      ],
+      "documents": 32,
+      "documents_flagged": 15
+     },
+     "own_recent": {
+      "n": 99,
+      "flagged": 32,
+      "share": 0.32323232323232326,
+      "ci95": [
+       0.23919862826396276,
+       0.4204721664339027
+      ],
+      "documents": 61,
+      "documents_flagged": 26
+     },
+     "own_school_undated": {
+      "n": 82,
+      "flagged": 24,
+      "share": 0.2926829268292683,
+      "ci95": [
+       0.2052619989088515,
+       0.3986596428126448
+      ],
+      "documents": 59,
+      "documents_flagged": 20
+     }
+    }
+   },
+   "binoculars": {
+    "public_test_humans": {
+     "n": 263,
+     "flagged": 6,
+     "share": 0.022813688212927757,
+     "ci95": [
+      0.010496544111168887,
+      0.04887051110061218
+     ]
+    },
+    "groups": {
+     "own_pre_ai": {
+      "n": 60,
+      "flagged": 5,
+      "share": 0.08333333333333333,
+      "ci95": [
+       0.03611992405048589,
+       0.18069168468112481
+      ],
+      "documents": 32,
+      "documents_flagged": 5
+     },
+     "own_recent": {
+      "n": 99,
+      "flagged": 20,
+      "share": 0.20202020202020202,
+      "ci95": [
+       0.13475627715378938,
+       0.29154591962261234
+      ],
+      "documents": 61,
+      "documents_flagged": 18
+     },
+     "own_school_undated": {
+      "n": 82,
+      "flagged": 4,
+      "share": 0.04878048780487805,
+      "ci95": [
+       0.0191307559738843,
+       0.11881634659643125
+      ],
+      "documents": 59,
+      "documents_flagged": 4
+     },
+     "own_journal_2024": {
+      "n": 66,
+      "flagged": 2,
+      "share": 0.030303030303030304,
+      "ci95": [
+       0.008349735075946503,
+       0.10392718870586834
+      ],
+      "documents": 1,
+      "documents_flagged": 1
+     }
+    }
+   },
+   "classifier-raid": {
+    "public_test_humans": {
+     "n": 263,
+     "flagged": 12,
+     "share": 0.045627376425855515,
+     "ci95": [
+      0.026290303194593807,
+      0.07804725136961208
+     ]
+    },
+    "groups": {
+     "own_pre_ai": {
+      "n": 60,
+      "flagged": 10,
+      "share": 0.16666666666666666,
+      "ci95": [
+       0.09313077201321032,
+       0.28031851497207827
+      ],
+      "documents": 32,
+      "documents_flagged": 10
+     },
+     "own_recent": {
+      "n": 99,
+      "flagged": 26,
+      "share": 0.26262626262626265,
+      "ci95": [
+       0.18598028163201125,
+       0.3570062141051224
+      ],
+      "documents": 61,
+      "documents_flagged": 21
+     },
+     "own_school_undated": {
+      "n": 82,
+      "flagged": 11,
+      "share": 0.13414634146341464,
+      "ci95": [
+       0.07658612768827223,
+       0.22445206358495667
+      ],
+      "documents": 59,
+      "documents_flagged": 10
+     },
+     "own_journal_2024": {
+      "n": 66,
+      "flagged": 0,
+      "share": 0.0,
+      "ci95": [
+       0.0,
+       0.05500446725160935
+      ],
+      "documents": 1,
+      "documents_flagged": 0
+     }
+    }
+   },
+   "classifier-mirrors": {
+    "public_test_humans": {
+     "n": 263,
+     "flagged": 15,
+     "share": 0.057034220532319393,
+     "ci95": [
+      0.03486434978625598,
+      0.0919584544541623
+     ]
+    },
+    "groups": {
+     "own_pre_ai": {
+      "n": 60,
+      "flagged": 8,
+      "share": 0.13333333333333333,
+      "ci95": [
+       0.06914026978309641,
+       0.24165394590072103
+      ],
+      "documents": 32,
+      "documents_flagged": 7
+     },
+     "own_recent": {
+      "n": 99,
+      "flagged": 30,
+      "share": 0.30303030303030304,
+      "ci95": [
+       0.2212615693494659,
+       0.3995144590281556
+      ],
+      "documents": 61,
+      "documents_flagged": 28
+     },
+     "own_school_undated": {
+      "n": 82,
+      "flagged": 4,
+      "share": 0.04878048780487805,
+      "ci95": [
+       0.0191307559738843,
+       0.11881634659643125
+      ],
+      "documents": 59,
+      "documents_flagged": 4
+     },
+     "own_journal_2024": {
+      "n": 66,
+      "flagged": 0,
+      "share": 0.0,
+      "ci95": [
+       0.0,
+       0.05500446725160935
+      ],
+      "documents": 1,
+      "documents_flagged": 0
+     }
+    }
+   },
+   "local-two": {
+    "public_test_humans": {
+     "n": 263,
+     "flagged": 8,
+     "share": 0.030418250950570342,
+     "ci95": [
+      0.015492213860800727,
+      0.058865007801788605
+     ]
+    },
+    "groups": {
+     "own_pre_ai": {
+      "n": 60,
+      "flagged": 10,
+      "share": 0.16666666666666666,
+      "ci95": [
+       0.09313077201321032,
+       0.28031851497207827
+      ],
+      "documents": 32,
+      "documents_flagged": 9
+     },
+     "own_recent": {
+      "n": 99,
+      "flagged": 32,
+      "share": 0.32323232323232326,
+      "ci95": [
+       0.23919862826396276,
+       0.4204721664339027
+      ],
+      "documents": 61,
+      "documents_flagged": 27
+     },
+     "own_school_undated": {
+      "n": 82,
+      "flagged": 6,
+      "share": 0.07317073170731707,
+      "ci95": [
+       0.03396431451476119,
+       0.15058024197067243
+      ],
+      "documents": 59,
+      "documents_flagged": 6
+     },
+     "own_journal_2024": {
+      "n": 66,
+      "flagged": 0,
+      "share": 0.0,
+      "ci95": [
+       0.0,
+       0.05500446725160935
+      ],
+      "documents": 1,
+      "documents_flagged": 0
+     }
+    }
+   },
+   "clef+binoculars": {
+    "public_test_humans": {
+     "n": 263,
+     "flagged": 17,
+     "share": 0.06463878326996197,
+     "ci95": [
+      0.04074510851378986,
+      0.10106786217743667
+     ]
+    },
+    "groups": {
+     "own_pre_ai": {
+      "n": 60,
+      "flagged": 35,
+      "share": 0.5833333333333334,
+      "ci95": [
+       0.45727854313239624,
+       0.6993591351212818
+      ],
+      "documents": 32,
+      "documents_flagged": 22
+     },
+     "own_recent": {
+      "n": 99,
+      "flagged": 50,
+      "share": 0.5050505050505051,
+      "ci95": [
+       0.4082299868548984,
+       0.6014937047251627
+      ],
+      "documents": 61,
+      "documents_flagged": 38
+     },
+     "own_school_undated": {
+      "n": 82,
+      "flagged": 32,
+      "share": 0.3902439024390244,
+      "ci95": [
+       0.2918451685297083,
+       0.4984662888522603
+      ],
+      "documents": 59,
+      "documents_flagged": 25
+     }
+    }
+   },
+   "all-three": {
+    "public_test_humans": {
+     "n": 263,
+     "flagged": 10,
+     "share": 0.03802281368821293,
+     "ci95": [
+      0.020781892630570023,
+      0.06856549548282757
+     ]
+    },
+    "groups": {
+     "own_pre_ai": {
+      "n": 60,
+      "flagged": 19,
+      "share": 0.31666666666666665,
+      "ci95": [
+       0.21305705841174333,
+       0.4423400494301654
+      ],
+      "documents": 32,
+      "documents_flagged": 14
+     },
+     "own_recent": {
+      "n": 99,
+      "flagged": 49,
+      "share": 0.494949494949495,
+      "ci95": [
+       0.39850629527483744,
+       0.5917700131451018
+      ],
+      "documents": 61,
+      "documents_flagged": 38
+     },
+     "own_school_undated": {
+      "n": 82,
+      "flagged": 18,
+      "share": 0.21951219512195122,
+      "ci95": [
+       0.14360671297875127,
+       0.32052256699739085
+      ],
+      "documents": 59,
+      "documents_flagged": 16
+     }
+    }
+   }
+  },
+  "150": {
+   "clef": {
+    "public_test_humans": {
+     "n": 263,
+     "flagged": 11,
+     "share": 0.04182509505703422,
+     "ci95": [
+      0.02351216226721163,
+      0.07333030907159009
+     ]
+    },
+    "groups": {
+     "own_pre_ai": {
+      "n": 60,
+      "flagged": 16,
+      "share": 0.26666666666666666,
+      "ci95": [
+       0.17132496487078852,
+       0.3900895360189135
+      ],
+      "documents": 32,
+      "documents_flagged": 11
+     },
+     "own_recent": {
+      "n": 99,
+      "flagged": 28,
+      "share": 0.2828282828282828,
+      "ci95": [
+       0.20351825976230095,
+       0.3783630022950766
+      ],
+      "documents": 61,
+      "documents_flagged": 24
+     },
+     "own_school_undated": {
+      "n": 82,
+      "flagged": 25,
+      "share": 0.3048780487804878,
+      "ci95": [
+       0.21583254094468948,
+       0.4113878277343659
+      ],
+      "documents": 59,
+      "documents_flagged": 22
+     }
+    }
+   },
+   "binoculars": {
+    "public_test_humans": {
+     "n": 263,
+     "flagged": 13,
+     "share": 0.049429657794676805,
+     "ci95": [
+      0.02911112116353915,
+      0.08272151662607086
+     ]
+    },
+    "groups": {
+     "own_pre_ai": {
+      "n": 60,
+      "flagged": 7,
+      "share": 0.11666666666666667,
+      "ci95": [
+       0.05767647403450049,
+       0.2217902059985814
+      ],
+      "documents": 32,
+      "documents_flagged": 7
+     },
+     "own_recent": {
+      "n": 99,
+      "flagged": 18,
+      "share": 0.18181818181818182,
+      "ci95": [
+       0.11821769885745204,
+       0.2691897315987058
+      ],
+      "documents": 61,
+      "documents_flagged": 14
+     },
+     "own_school_undated": {
+      "n": 82,
+      "flagged": 7,
+      "share": 0.08536585365853659,
+      "ci95": [
+       0.04196599135384306,
+       0.16587729208914964
+      ],
+      "documents": 59,
+      "documents_flagged": 7
+     },
+     "own_journal_2024": {
+      "n": 66,
+      "flagged": 2,
+      "share": 0.030303030303030304,
+      "ci95": [
+       0.008349735075946503,
+       0.10392718870586834
+      ],
+      "documents": 1,
+      "documents_flagged": 1
+     }
+    }
+   },
+   "classifier-raid": {
+    "public_test_humans": {
+     "n": 263,
+     "flagged": 15,
+     "share": 0.057034220532319393,
+     "ci95": [
+      0.03486434978625598,
+      0.0919584544541623
+     ]
+    },
+    "groups": {
+     "own_pre_ai": {
+      "n": 60,
+      "flagged": 14,
+      "share": 0.23333333333333334,
+      "ci95": [
+       0.1443943161843107,
+       0.3543651134039202
+      ],
+      "documents": 32,
+      "documents_flagged": 13
+     },
+     "own_recent": {
+      "n": 99,
+      "flagged": 34,
+      "share": 0.3434343434343434,
+      "ci95": [
+       0.25731989006284084,
+       0.44124567095526857
+      ],
+      "documents": 61,
+      "documents_flagged": 26
+     },
+     "own_school_undated": {
+      "n": 82,
+      "flagged": 11,
+      "share": 0.13414634146341464,
+      "ci95": [
+       0.07658612768827223,
+       0.22445206358495667
+      ],
+      "documents": 59,
+      "documents_flagged": 10
+     },
+     "own_journal_2024": {
+      "n": 66,
+      "flagged": 0,
+      "share": 0.0,
+      "ci95": [
+       0.0,
+       0.05500446725160935
+      ],
+      "documents": 1,
+      "documents_flagged": 0
+     }
+    }
+   },
+   "classifier-mirrors": {
+    "public_test_humans": {
+     "n": 263,
+     "flagged": 12,
+     "share": 0.045627376425855515,
+     "ci95": [
+      0.026290303194593807,
+      0.07804725136961208
+     ]
+    },
+    "groups": {
+     "own_pre_ai": {
+      "n": 60,
+      "flagged": 6,
+      "share": 0.1,
+      "ci95": [
+       0.04664219945723587,
+       0.20149694492511044
+      ],
+      "documents": 32,
+      "documents_flagged": 5
+     },
+     "own_recent": {
+      "n": 99,
+      "flagged": 35,
+      "share": 0.35353535353535354,
+      "ci95": [
+       0.2664470798753757,
+       0.45156586430285567
+      ],
+      "documents": 61,
+      "documents_flagged": 31
+     },
+     "own_school_undated": {
+      "n": 82,
+      "flagged": 4,
+      "share": 0.04878048780487805,
+      "ci95": [
+       0.0191307559738843,
+       0.11881634659643125
+      ],
+      "documents": 59,
+      "documents_flagged": 4
+     },
+     "own_journal_2024": {
+      "n": 66,
+      "flagged": 0,
+      "share": 0.0,
+      "ci95": [
+       0.0,
+       0.05500446725160935
+      ],
+      "documents": 1,
+      "documents_flagged": 0
+     }
+    }
+   },
+   "local-two": {
+    "public_test_humans": {
+     "n": 263,
+     "flagged": 13,
+     "share": 0.049429657794676805,
+     "ci95": [
+      0.02911112116353915,
+      0.08272151662607086
+     ]
+    },
+    "groups": {
+     "own_pre_ai": {
+      "n": 60,
+      "flagged": 9,
+      "share": 0.15,
+      "ci95": [
+       0.08097349242295689,
+       0.26114825891159615
+      ],
+      "documents": 32,
+      "documents_flagged": 9
+     },
+     "own_recent": {
+      "n": 99,
+      "flagged": 38,
+      "share": 0.3838383838383838,
+      "ci95": [
+       0.29408494593454726,
+       0.48227014772404997
+      ],
+      "documents": 61,
+      "documents_flagged": 31
+     },
+     "own_school_undated": {
+      "n": 82,
+      "flagged": 6,
+      "share": 0.07317073170731707,
+      "ci95": [
+       0.03396431451476119,
+       0.15058024197067243
+      ],
+      "documents": 59,
+      "documents_flagged": 6
+     },
+     "own_journal_2024": {
+      "n": 66,
+      "flagged": 0,
+      "share": 0.0,
+      "ci95": [
+       0.0,
+       0.05500446725160935
+      ],
+      "documents": 1,
+      "documents_flagged": 0
+     }
+    }
+   },
+   "clef+binoculars": {
+    "public_test_humans": {
+     "n": 263,
+     "flagged": 10,
+     "share": 0.03802281368821293,
+     "ci95": [
+      0.020781892630570023,
+      0.06856549548282757
+     ]
+    },
+    "groups": {
+     "own_pre_ai": {
+      "n": 60,
+      "flagged": 30,
+      "share": 0.5,
+      "ci95": [
+       0.37734812427246284,
+       0.6226518757275372
+      ],
+      "documents": 32,
+      "documents_flagged": 24
+     },
+     "own_recent": {
+      "n": 99,
+      "flagged": 45,
+      "share": 0.45454545454545453,
+      "ci95": [
+       0.3599919588990025,
+       0.5524948168804487
+      ],
+      "documents": 61,
+      "documents_flagged": 36
+     },
+     "own_school_undated": {
+      "n": 82,
+      "flagged": 31,
+      "share": 0.3780487804878049,
+      "ci95": [
+       0.28078209931893033,
+       0.4862306311054793
+      ],
+      "documents": 59,
+      "documents_flagged": 25
+     }
+    }
+   },
+   "all-three": {
+    "public_test_humans": {
+     "n": 263,
+     "flagged": 9,
+     "share": 0.034220532319391636,
+     "ci95": [
+      0.018105895346679998,
+      0.06374640954131347
+     ]
+    },
+    "groups": {
+     "own_pre_ai": {
+      "n": 60,
+      "flagged": 23,
+      "share": 0.38333333333333336,
+      "ci95": [
+       0.2708808958488824,
+       0.5098263545959686
+      ],
+      "documents": 32,
+      "documents_flagged": 21
+     },
+     "own_recent": {
+      "n": 99,
+      "flagged": 59,
+      "share": 0.5959595959595959,
+      "ci95": [
+       0.4974671538075806,
+       0.6872829862135781
+      ],
+      "documents": 61,
+      "documents_flagged": 45
+     },
+     "own_school_undated": {
+      "n": 82,
+      "flagged": 16,
+      "share": 0.1951219512195122,
+      "ci95": [
+       0.12382792433083327,
+       0.2937039017301908
+      ],
+      "documents": 59,
+      "documents_flagged": 14
+     }
+    }
+   }
+  },
+  "300": {
+   "clef": {
+    "public_test_humans": {
+     "n": 263,
+     "flagged": 12,
+     "share": 0.045627376425855515,
+     "ci95": [
+      0.026290303194593807,
+      0.07804725136961208
+     ]
+    },
+    "groups": {
+     "own_pre_ai": {
+      "n": 50,
+      "flagged": 21,
+      "share": 0.42,
+      "ci95": [
+       0.2937479723456693,
+       0.5576680331222217
+      ],
+      "documents": 29,
+      "documents_flagged": 15
+     },
+     "own_recent": {
+      "n": 84,
+      "flagged": 42,
+      "share": 0.5,
+      "ci95": [
+       0.39543750035009767,
+       0.6045624996499024
+      ],
+      "documents": 54,
+      "documents_flagged": 33
+     },
+     "own_school_undated": {
+      "n": 65,
+      "flagged": 20,
+      "share": 0.3076923076923077,
+      "ci95": [
+       0.20886876704271462,
+       0.4279787205229433
+      ],
+      "documents": 48,
+      "documents_flagged": 16
+     }
+    }
+   },
+   "binoculars": {
+    "public_test_humans": {
+     "n": 263,
+     "flagged": 10,
+     "share": 0.03802281368821293,
+     "ci95": [
+      0.020781892630570023,
+      0.06856549548282757
+     ]
+    },
+    "groups": {
+     "own_pre_ai": {
+      "n": 50,
+      "flagged": 2,
+      "share": 0.04,
+      "ci95": [
+       0.011038652660826577,
+       0.13460337877954667
+      ],
+      "documents": 29,
+      "documents_flagged": 2
+     },
+     "own_recent": {
+      "n": 84,
+      "flagged": 16,
+      "share": 0.19047619047619047,
+      "ci95": [
+       0.12078595196346183,
+       0.2872394027659602
+      ],
+      "documents": 54,
+      "documents_flagged": 14
+     },
+     "own_school_undated": {
+      "n": 65,
+      "flagged": 4,
+      "share": 0.06153846153846154,
+      "ci95": [
+       0.024188663436562223,
+       0.14782360821313795
+      ],
+      "documents": 48,
+      "documents_flagged": 4
+     },
+     "own_journal_2024": {
+      "n": 65,
+      "flagged": 1,
+      "share": 0.015384615384615385,
+      "ci95": [
+       0.002720874527486622,
+       0.08213479413797146
+      ],
+      "documents": 1,
+      "documents_flagged": 1
+     }
+    }
+   },
+   "classifier-raid": {
+    "public_test_humans": {
+     "n": 263,
+     "flagged": 8,
+     "share": 0.030418250950570342,
+     "ci95": [
+      0.015492213860800727,
+      0.058865007801788605
+     ]
+    },
+    "groups": {
+     "own_pre_ai": {
+      "n": 50,
+      "flagged": 3,
+      "share": 0.06,
+      "ci95": [
+       0.020614596364630478,
+       0.16217343370877002
+      ],
+      "documents": 29,
+      "documents_flagged": 3
+     },
+     "own_recent": {
+      "n": 84,
+      "flagged": 27,
+      "share": 0.32142857142857145,
+      "ci95": [
+       0.23125977350162447,
+       0.42721639268842665
+      ],
+      "documents": 54,
+      "documents_flagged": 21
+     },
+     "own_school_undated": {
+      "n": 65,
+      "flagged": 8,
+      "share": 0.12307692307692308,
+      "ci95": [
+       0.06370391444937325,
+       0.22451716117931636
+      ],
+      "documents": 48,
+      "documents_flagged": 7
+     },
+     "own_journal_2024": {
+      "n": 65,
+      "flagged": 1,
+      "share": 0.015384615384615385,
+      "ci95": [
+       0.002720874527486622,
+       0.08213479413797146
+      ],
+      "documents": 1,
+      "documents_flagged": 1
+     }
+    }
+   },
+   "classifier-mirrors": {
+    "public_test_humans": {
+     "n": 263,
+     "flagged": 7,
+     "share": 0.026615969581749048,
+     "ci95": [
+      0.012951195827670212,
+      0.053910942609514984
+     ]
+    },
+    "groups": {
+     "own_pre_ai": {
+      "n": 50,
+      "flagged": 4,
+      "share": 0.08,
+      "ci95": [
+       0.031549003255790686,
+       0.18838502545063704
+      ],
+      "documents": 29,
+      "documents_flagged": 4
+     },
+     "own_recent": {
+      "n": 84,
+      "flagged": 40,
+      "share": 0.47619047619047616,
+      "ci95": [
+       0.3727826732247559,
+       0.5816808156005842
+      ],
+      "documents": 54,
+      "documents_flagged": 35
+     },
+     "own_school_undated": {
+      "n": 65,
+      "flagged": 4,
+      "share": 0.06153846153846154,
+      "ci95": [
+       0.024188663436562223,
+       0.14782360821313795
+      ],
+      "documents": 48,
+      "documents_flagged": 4
+     },
+     "own_journal_2024": {
+      "n": 65,
+      "flagged": 2,
+      "share": 0.03076923076923077,
+      "ci95": [
+       0.008478819400945352,
+       0.10542905025926008
+      ],
+      "documents": 1,
+      "documents_flagged": 1
+     }
+    }
+   },
+   "local-two": {
+    "public_test_humans": {
+     "n": 263,
+     "flagged": 17,
+     "share": 0.06463878326996197,
+     "ci95": [
+      0.04074510851378986,
+      0.10106786217743667
+     ]
+    },
+    "groups": {
+     "own_pre_ai": {
+      "n": 50,
+      "flagged": 11,
+      "share": 0.22,
+      "ci95": [
+       0.12753786224302288,
+       0.35241815689459555
+      ],
+      "documents": 29,
+      "documents_flagged": 11
+     },
+     "own_recent": {
+      "n": 84,
+      "flagged": 48,
+      "share": 0.5714285714285714,
+      "ci95": [
+       0.4647675967027547,
+       0.6718419368212247
+      ],
+      "documents": 54,
+      "documents_flagged": 36
+     },
+     "own_school_undated": {
+      "n": 65,
+      "flagged": 7,
+      "share": 0.1076923076923077,
+      "ci95": [
+       0.05315354431925605,
+       0.20601533031468616
+      ],
+      "documents": 48,
+      "documents_flagged": 7
+     },
+     "own_journal_2024": {
+      "n": 65,
+      "flagged": 1,
+      "share": 0.015384615384615385,
+      "ci95": [
+       0.002720874527486622,
+       0.08213479413797146
+      ],
+      "documents": 1,
+      "documents_flagged": 1
+     }
+    }
+   },
+   "clef+binoculars": {
+    "public_test_humans": {
+     "n": 263,
+     "flagged": 12,
+     "share": 0.045627376425855515,
+     "ci95": [
+      0.026290303194593807,
+      0.07804725136961208
+     ]
+    },
+    "groups": {
+     "own_pre_ai": {
+      "n": 50,
+      "flagged": 32,
+      "share": 0.64,
+      "ci95": [
+       0.5014076201030195,
+       0.7586143703281711
+      ],
+      "documents": 29,
+      "documents_flagged": 23
+     },
+     "own_recent": {
+      "n": 84,
+      "flagged": 64,
+      "share": 0.7619047619047619,
+      "ci95": [
+       0.6606473307381485,
+       0.8402542921831097
+      ],
+      "documents": 54,
+      "documents_flagged": 45
+     },
+     "own_school_undated": {
+      "n": 65,
+      "flagged": 28,
+      "share": 0.4307692307692308,
+      "ci95": [
+       0.31759267537345776,
+       0.5516724201501791
+      ],
+      "documents": 48,
+      "documents_flagged": 23
+     }
+    }
+   },
+   "all-three": {
+    "public_test_humans": {
+     "n": 263,
+     "flagged": 12,
+     "share": 0.045627376425855515,
+     "ci95": [
+      0.026290303194593807,
+      0.07804725136961208
+     ]
+    },
+    "groups": {
+     "own_pre_ai": {
+      "n": 50,
+      "flagged": 22,
+      "share": 0.44,
+      "ci95": [
+       0.3116198721023534,
+       0.5769421319985648
+      ],
+      "documents": 29,
+      "documents_flagged": 20
+     },
+     "own_recent": {
+      "n": 84,
+      "flagged": 65,
+      "share": 0.7738095238095238,
+      "ci95": [
+       0.6735289274916636,
+       0.8501409510169247
+      ],
+      "documents": 54,
+      "documents_flagged": 48
+     },
+     "own_school_undated": {
+      "n": 65,
+      "flagged": 19,
+      "share": 0.2923076923076923,
+      "ci95": [
+       0.19583261556264242,
+       0.4119626710082681
+      ],
+      "documents": 48,
+      "documents_flagged": 17
+     }
+    }
+   }
+  },
+  "500": {
+   "clef": {
+    "public_test_humans": {
+     "n": 111,
+     "flagged": 7,
+     "share": 0.06306306306306306,
+     "ci95": [
+      0.03088026451475212,
+      0.12447807253384349
+     ]
+    },
+    "groups": {
+     "own_pre_ai": {
+      "n": 37,
+      "flagged": 13,
+      "share": 0.35135135135135137,
+      "ci95": [
+       0.2182540663110087,
+       0.5124127048243043
+      ],
+      "documents": 25,
+      "documents_flagged": 12
+     },
+     "own_recent": {
+      "n": 72,
+      "flagged": 43,
+      "share": 0.5972222222222222,
+      "ci95": [
+       0.4818046137128726,
+       0.702790647990467
+      ],
+      "documents": 52,
+      "documents_flagged": 35
+     },
+     "own_school_undated": {
+      "n": 43,
+      "flagged": 12,
+      "share": 0.27906976744186046,
+      "ci95": [
+       0.16746451821827157,
+       0.42691312900129397
+      ],
+      "documents": 29,
+      "documents_flagged": 9
+     }
+    }
+   },
+   "binoculars": {
+    "public_test_humans": {
+     "n": 111,
+     "flagged": 4,
+     "share": 0.036036036036036036,
+     "ci95": [
+      0.014101074357880557,
+      0.08901138663186531
+     ]
+    },
+    "groups": {
+     "own_pre_ai": {
+      "n": 37,
+      "flagged": 3,
+      "share": 0.08108108108108109,
+      "ci95": [
+       0.027960066396321384,
+       0.2130099249850153
+      ],
+      "documents": 25,
+      "documents_flagged": 3
+     },
+     "own_recent": {
+      "n": 72,
+      "flagged": 10,
+      "share": 0.1388888888888889,
+      "ci95": [
+       0.07722647811471899,
+       0.23713397841573391
+      ],
+      "documents": 52,
+      "documents_flagged": 7
+     },
+     "own_school_undated": {
+      "n": 43,
+      "flagged": 5,
+      "share": 0.11627906976744186,
+      "ci95": [
+       0.050703529948620846,
+       0.24479448890641395
+      ],
+      "documents": 29,
+      "documents_flagged": 5
+     },
+     "own_journal_2024": {
+      "n": 65,
+      "flagged": 1,
+      "share": 0.015384615384615385,
+      "ci95": [
+       0.002720874527486622,
+       0.08213479413797146
+      ],
+      "documents": 1,
+      "documents_flagged": 1
+     }
+    }
+   },
+   "classifier-raid": {
+    "public_test_humans": {
+     "n": 111,
+     "flagged": 6,
+     "share": 0.05405405405405406,
+     "ci95": [
+      0.02500597339497708,
+      0.11293707163400198
+     ]
+    },
+    "groups": {
+     "own_pre_ai": {
+      "n": 37,
+      "flagged": 6,
+      "share": 0.16216216216216217,
+      "ci95": [
+       0.07651103235297099,
+       0.31136799295455864
+      ],
+      "documents": 25,
+      "documents_flagged": 6
+     },
+     "own_recent": {
+      "n": 72,
+      "flagged": 28,
+      "share": 0.3888888888888889,
+      "ci95": [
+       0.2846554187000152,
+       0.5043785679247396
+      ],
+      "documents": 52,
+      "documents_flagged": 20
+     },
+     "own_school_undated": {
+      "n": 43,
+      "flagged": 9,
+      "share": 0.20930232558139536,
+      "ci95": [
+       0.11422705997811457,
+       0.35205931794236645
+      ],
+      "documents": 29,
+      "documents_flagged": 9
+     },
+     "own_journal_2024": {
+      "n": 65,
+      "flagged": 1,
+      "share": 0.015384615384615385,
+      "ci95": [
+       0.002720874527486622,
+       0.08213479413797146
+      ],
+      "documents": 1,
+      "documents_flagged": 1
+     }
+    }
+   },
+   "classifier-mirrors": {
+    "public_test_humans": {
+     "n": 111,
+     "flagged": 2,
+     "share": 0.018018018018018018,
+     "ci95": [
+      0.004955074866777286,
+      0.06332680208373542
+     ]
+    },
+    "groups": {
+     "own_pre_ai": {
+      "n": 37,
+      "flagged": 4,
+      "share": 0.10810810810810811,
+      "ci95": [
+       0.04285120520506268,
+       0.24708846415167163
+      ],
+      "documents": 25,
+      "documents_flagged": 4
+     },
+     "own_recent": {
+      "n": 72,
+      "flagged": 39,
+      "share": 0.5416666666666666,
+      "ci95": [
+       0.42739664196707616,
+       0.6517156130486407
+      ],
+      "documents": 52,
+      "documents_flagged": 33
+     },
+     "own_school_undated": {
+      "n": 43,
+      "flagged": 7,
+      "share": 0.16279069767441862,
+      "ci95": [
+       0.08116524502857546,
+       0.2997269533591824
+      ],
+      "documents": 29,
+      "documents_flagged": 7
+     },
+     "own_journal_2024": {
+      "n": 65,
+      "flagged": 2,
+      "share": 0.03076923076923077,
+      "ci95": [
+       0.008478819400945352,
+       0.10542905025926008
+      ],
+      "documents": 1,
+      "documents_flagged": 1
+     }
+    }
+   },
+   "local-two": {
+    "public_test_humans": {
+     "n": 111,
+     "flagged": 2,
+     "share": 0.018018018018018018,
+     "ci95": [
+      0.004955074866777286,
+      0.06332680208373542
+     ]
+    },
+    "groups": {
+     "own_pre_ai": {
+      "n": 37,
+      "flagged": 7,
+      "share": 0.1891891891891892,
+      "ci95": [
+       0.09479858757337126,
+       0.342050115709556
+      ],
+      "documents": 25,
+      "documents_flagged": 7
+     },
+     "own_recent": {
+      "n": 72,
+      "flagged": 43,
+      "share": 0.5972222222222222,
+      "ci95": [
+       0.4818046137128726,
+       0.702790647990467
+      ],
+      "documents": 52,
+      "documents_flagged": 32
+     },
+     "own_school_undated": {
+      "n": 43,
+      "flagged": 13,
+      "share": 0.3023255813953488,
+      "ci95": [
+       0.18601827946182872,
+       0.4510564575240983
+      ],
+      "documents": 29,
+      "documents_flagged": 12
+     },
+     "own_journal_2024": {
+      "n": 65,
+      "flagged": 1,
+      "share": 0.015384615384615385,
+      "ci95": [
+       0.002720874527486622,
+       0.08213479413797146
+      ],
+      "documents": 1,
+      "documents_flagged": 1
+     }
+    }
+   },
+   "clef+binoculars": {
+    "public_test_humans": {
+     "n": 111,
+     "flagged": 9,
+     "share": 0.08108108108108109,
+     "ci95": [
+      0.04324151215311865,
+      0.14694740893471014
+     ]
+    },
+    "groups": {
+     "own_pre_ai": {
+      "n": 37,
+      "flagged": 16,
+      "share": 0.43243243243243246,
+      "ci95": [
+       0.2867148684035131,
+       0.5908609366579929
+      ],
+      "documents": 25,
+      "documents_flagged": 14
+     },
+     "own_recent": {
+      "n": 72,
+      "flagged": 49,
+      "share": 0.6805555555555556,
+      "ci95": [
+       0.5660743422203383,
+       0.7767454295144354
+      ],
+      "documents": 52,
+      "documents_flagged": 37
+     },
+     "own_school_undated": {
+      "n": 43,
+      "flagged": 18,
+      "share": 0.4186046511627907,
+      "ci95": [
+       0.2838433433748524,
+       0.5667168424428823
+      ],
+      "documents": 29,
+      "documents_flagged": 15
+     }
+    }
+   },
+   "all-three": {
+    "public_test_humans": {
+     "n": 111,
+     "flagged": 3,
+     "share": 0.02702702702702703,
+     "ci95": [
+      0.00923347121399111,
+      0.07646369775613819
+     ]
+    },
+    "groups": {
+     "own_pre_ai": {
+      "n": 37,
+      "flagged": 13,
+      "share": 0.35135135135135137,
+      "ci95": [
+       0.2182540663110087,
+       0.5124127048243043
+      ],
+      "documents": 25,
+      "documents_flagged": 11
+     },
+     "own_recent": {
+      "n": 72,
+      "flagged": 53,
+      "share": 0.7361111111111112,
+      "ci95": [
+       0.6242391943879235,
+       0.8240635840344728
+      ],
+      "documents": 52,
+      "documents_flagged": 39
+     },
+     "own_school_undated": {
+      "n": 43,
+      "flagged": 15,
+      "share": 0.3488372093023256,
+      "ci95": [
+       0.22418398748963103,
+       0.49828492902901905
+      ],
+      "documents": 29,
+      "documents_flagged": 13
+     }
+    }
+   }
+  }
+ },
+ "recalibrated": {
+  "75": {
+   "clef": {
+    "reference_passages": 60,
+    "ai_caught_public_bar": 0.48704663212435234,
+    "ai_caught_private_bar": 0.35751295336787564,
+    "public_humans_flagged_private_bar": 0.022813688212927757,
+    "auroc_public_ai_over_reference": 0.577461139896373,
+    "auroc_public_ai_over_public_humans": 0.8343840501191907
+   },
+   "binoculars": {
+    "reference_passages": 60,
+    "ai_caught_public_bar": 0.5129533678756477,
+    "ai_caught_private_bar": 0.40932642487046633,
+    "public_humans_flagged_private_bar": 0.0076045627376425855,
+    "auroc_public_ai_over_reference": 0.8066493955094991,
+    "auroc_public_ai_over_public_humans": 0.8803955948698753
+   },
+   "classifier-raid": {
+    "reference_passages": 60,
+    "ai_caught_public_bar": 0.5958549222797928,
+    "ai_caught_private_bar": 0.33678756476683935,
+    "public_humans_flagged_private_bar": 0.011406844106463879,
+    "auroc_public_ai_over_reference": 0.774740932642487,
+    "auroc_public_ai_over_public_humans": 0.8846706987923324
+   },
+   "classifier-mirrors": {
+    "reference_passages": 60,
+    "ai_caught_public_bar": 0.7823834196891192,
+    "ai_caught_private_bar": 0.6269430051813472,
+    "public_humans_flagged_private_bar": 0.015209125475285171,
+    "auroc_public_ai_over_reference": 0.9143350604490501,
+    "auroc_public_ai_over_public_humans": 0.9584113162197837
+   }
+  },
+  "150": {
+   "clef": {
+    "reference_passages": 60,
+    "ai_caught_public_bar": 0.5854922279792746,
+    "ai_caught_private_bar": 0.40932642487046633,
+    "public_humans_flagged_private_bar": 0.011406844106463879,
+    "auroc_public_ai_over_reference": 0.6626943005181347,
+    "auroc_public_ai_over_public_humans": 0.8930830000591028
+   },
+   "binoculars": {
+    "reference_passages": 60,
+    "ai_caught_public_bar": 0.689119170984456,
+    "ai_caught_private_bar": 0.5440414507772021,
+    "public_humans_flagged_private_bar": 0.015209125475285171,
+    "auroc_public_ai_over_reference": 0.8527633851468048,
+    "auroc_public_ai_over_public_humans": 0.908961957485372
+   },
+   "classifier-raid": {
+    "reference_passages": 60,
+    "ai_caught_public_bar": 0.689119170984456,
+    "ai_caught_private_bar": 0.533678756476684,
+    "public_humans_flagged_private_bar": 0.0076045627376425855,
+    "auroc_public_ai_over_reference": 0.8109671848013817,
+    "auroc_public_ai_over_public_humans": 0.9156602769952127
+   },
+   "classifier-mirrors": {
+    "reference_passages": 60,
+    "ai_caught_public_bar": 0.8497409326424871,
+    "ai_caught_private_bar": 0.694300518134715,
+    "public_humans_flagged_private_bar": 0.019011406844106463,
+    "auroc_public_ai_over_reference": 0.9462003454231434,
+    "auroc_public_ai_over_public_humans": 0.9771863117870723
+   }
+  },
+  "300": {
+   "clef": {
+    "reference_passages": 50,
+    "ai_caught_public_bar": 0.7564766839378239,
+    "ai_caught_private_bar": 0.6476683937823834,
+    "public_humans_flagged_private_bar": 0.019011406844106463,
+    "auroc_public_ai_over_reference": 0.7726424870466321,
+    "auroc_public_ai_over_public_humans": 0.9365334226442601
+   },
+   "binoculars": {
+    "reference_passages": 50,
+    "ai_caught_public_bar": 0.7253886010362695,
+    "ai_caught_private_bar": 0.7253886010362695,
+    "public_humans_flagged_private_bar": 0.03802281368821293,
+    "auroc_public_ai_over_reference": 0.8716062176165803,
+    "auroc_public_ai_over_public_humans": 0.9177879784865738
+   },
+   "classifier-raid": {
+    "reference_passages": 50,
+    "ai_caught_public_bar": 0.694300518134715,
+    "ai_caught_private_bar": 0.6476683937823834,
+    "public_humans_flagged_private_bar": 0.0076045627376425855,
+    "auroc_public_ai_over_reference": 0.8349222797927461,
+    "auroc_public_ai_over_public_humans": 0.9345534782009102
+   },
+   "classifier-mirrors": {
+    "reference_passages": 50,
+    "ai_caught_public_bar": 0.9067357512953368,
+    "ai_caught_private_bar": 0.8549222797927462,
+    "public_humans_flagged_private_bar": 0.015209125475285171,
+    "auroc_public_ai_over_reference": 0.9662176165803109,
+    "auroc_public_ai_over_public_humans": 0.9881991370988397
+   }
+  },
+  "500": {
+   "clef": {
+    "reference_passages": 37,
+    "ai_caught_public_bar": 0.7368421052631579,
+    "ai_caught_private_bar": 0.6447368421052632,
+    "public_humans_flagged_private_bar": 0.036036036036036036,
+    "auroc_public_ai_over_reference": 0.8122332859174964,
+    "auroc_public_ai_over_public_humans": 0.9408487434803224
+   },
+   "binoculars": {
+    "reference_passages": 37,
+    "ai_caught_public_bar": 0.5394736842105263,
+    "ai_caught_private_bar": 0.4868421052631579,
+    "public_humans_flagged_private_bar": 0.0,
+    "auroc_public_ai_over_reference": 0.7652916073968705,
+    "auroc_public_ai_over_public_humans": 0.8258653390232338
+   },
+   "classifier-raid": {
+    "reference_passages": 37,
+    "ai_caught_public_bar": 0.4868421052631579,
+    "ai_caught_private_bar": 0.3815789473684211,
+    "public_humans_flagged_private_bar": 0.009009009009009009,
+    "auroc_public_ai_over_reference": 0.7021692745376956,
+    "auroc_public_ai_over_public_humans": 0.8760075865339023
+   },
+   "classifier-mirrors": {
+    "reference_passages": 37,
+    "ai_caught_public_bar": 0.9473684210526315,
+    "ai_caught_private_bar": 0.7894736842105263,
+    "public_humans_flagged_private_bar": 0.018018018018018018,
+    "auroc_public_ai_over_reference": 0.9743954480796586,
+    "auroc_public_ai_over_public_humans": 0.9943100995732574
+   }
+  }
+ }
+}
