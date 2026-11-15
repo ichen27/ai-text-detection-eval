@@ -292,6 +292,8 @@ uv run python -m detecteval.serve            # http://127.0.0.1:8941
 - **MCP:** streamable HTTP at `http://127.0.0.1:8941/mcp`, tools `detect_ai_text` and
   `about_ai_text_detector`. The endpoint answers only requests addressed to localhost, so a reverse proxy
   that serves the page under another hostname does not expose it.
+- **Hosts:** the service answers for `localhost` and `127.0.0.1`. To serve the page through a reverse
+  proxy, set `DETECTOR_ALLOWED_HOSTS` to its hostname. The scoring API rejects cross-site browser requests.
 - **Memory:** the service itself is about 50 MB. The models run in a worker process that starts on the
   first request (10 to 30 seconds) and is stopped after five idle minutes. The classifier needs about
   0.5 GB; Binoculars adds about 3 GB and is skipped when the machine is short of memory.

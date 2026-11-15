@@ -8,9 +8,11 @@
     POST /api/detect  {"text": "...", "binoculars": false}
     /mcp              MCP over streamable HTTP, tool ``detect_ai_text``
 
-Binds HOST and PORT (default 127.0.0.1:8941). The MCP endpoint keeps the SDK's default host check, so it
-answers only requests addressed to localhost: a hub on the same machine can use it, a reverse proxy
-serving the web page under another hostname cannot.
+Binds HOST and PORT (default 127.0.0.1:8941). Requests are accepted only for localhost and for hostnames
+listed in DETECTOR_ALLOWED_HOSTS (comma-separated; set it to the public hostname when a reverse proxy
+serves the page). The scoring API also requires a JSON content type and, when a browser sends an Origin,
+that it matches the host, so another website cannot drive the detector through the visitor's browser.
+The MCP endpoint keeps the SDK's stricter default and answers only requests addressed to localhost.
 
 The models run in a separate worker process that starts on the first request and is stopped after
 IDLE_SECONDS without one, so the service costs almost no memory while idle. Nothing leaves the machine.
@@ -26,9 +28,12 @@ import time
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 from pathlib import Path
+from urllib.parse import urlsplit
 
 from mcp.server import MCPServer
 from starlette.applications import Starlette
+from starlette.middleware import Middleware
+from starlette.middleware.trustedhost import TrustedHostMiddleware
 from starlette.requests import Request
 from starlette.responses import FileResponse, JSONResponse
 from starlette.routing import Mount, Route
@@ -162,9 +167,38 @@ async def info(_: Request) -> JSONResponse:
     return JSONResponse({**ABOUT, "private_reference": calibration.private_path().exists()})
 
 
+def allowed_hosts() -> list[str]:
+    extra = [host.strip() for host in os.environ.get("DETECTOR_ALLOWED_HOSTS", "").split(",") if host.strip()]
+    return ["127.0.0.1", "localhost", *extra]
+
+
+def same_origin(request: Request) -> bool:
+    """True when the request carries no Origin (not a cross-site browser call) or one matching its host."""
+    origin = request.headers.get("origin")
+    return origin is None or urlsplit(origin).netloc.lower() == request.headers.get("host", "").lower()
+
+
+async def read_limited(request: Request, limit: int) -> bytes | None:
+    """The request body, or None as soon as it is known to exceed ``limit`` bytes."""
+    declared = request.headers.get("content-length", "")
+    if declared.isdigit() and int(declared) > limit:
+        return None
+    chunks, size = [], 0
+    async for chunk in request.stream():
+        size += len(chunk)
+        if size > limit:
+            return None
+        chunks.append(chunk)
+    return b"".join(chunks)
+
+
 async def api_detect(request: Request) -> JSONResponse:
-    body = await request.body()
-    if len(body) > MAX_BODY_BYTES:
+    if not request.headers.get("content-type", "").lower().startswith("application/json"):
+        return JSONResponse({"ok": False, "error": "Send the request as application/json."}, 415)
+    if not same_origin(request):
+        return JSONResponse({"ok": False, "error": "Requests from other sites are not accepted."}, 403)
+    body = await read_limited(request, MAX_BODY_BYTES)
+    if body is None:
         return JSONResponse({"ok": False, "error": "Text is too long; send at most about 60,000 words."}, 413)
     try:
         payload = json.loads(body)
@@ -222,6 +256,7 @@ async def lifespan(_: Starlette) -> AsyncIterator[None]:
 app = Starlette(
     routes=[Route("/", index), Route("/health", health), Route("/api/info", info),
             Route("/api/detect", api_detect, methods=["POST"]), Mount("/", app=mcp_app)],
+    middleware=[Middleware(TrustedHostMiddleware, allowed_hosts=allowed_hosts())],
     lifespan=lifespan,
 )
 
