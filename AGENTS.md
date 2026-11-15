@@ -21,6 +21,8 @@ classifier fine-tuned on examples. It is an evaluation harness, not a detector p
   - Local detectors: `binoculars`; `generate_mirrors`, `train_data`, `train_classifier`, `classify`.
   - Comparison of everything on held-out halves: `compare`, `compare_report`.
   - Private writing: `private_eval` scores documents listed in `RAW_DATA_DIR/private/manifest.jsonl`.
+  - Detector service: `calibration` (reference scores), `detector` (passages and bands, no PyTorch),
+    `worker` (model process), `serve` (web page, JSON API and MCP endpoint), `static/index.html`.
 - `data/` — both evaluation sets, the texts generated for them, and the training mirrors (committed).
 - `results/` — scores per detector, summaries, reports and figures (committed deliverables).
 - Raw third-party downloads and trained model weights live outside Git in `RAW_DATA_DIR` (default
@@ -50,6 +52,23 @@ classifier fine-tuned on examples. It is an evaluation harness, not a detector p
 - The local detectors need the optional `ml` dependency group (`uv sync --group ml`) and several
   gigabytes of free memory. Run one at a time. CI does not install that group, so modules that need
   PyTorch import it inside `main()` and tests cover only the NumPy parts.
+
+## The deployed detector
+
+The service is deployed on the Mac mini through the app launcher as `ai-detector`
+(https://app-ai-detector.chenagent.com, owner sign-in) from [launcher.json](launcher.json), and is
+registered in the MCP hub as the lazy HTTP backend `ai-detector` (tools prefixed `ai_detector__`).
+
+- It runs from this canonical checkout with its own environment at
+  `/Volumes/SamsungSSD1/tools/ai-text-detection/venv`, so `ci/run.sh` and `uv sync` here do not disturb
+  it. Code changes take effect on restart: `node src/cli.mjs restart ai-detector` in the launcher checkout.
+  Keep the checkout on `main` when not actively working, or develop service changes in a worktree.
+- After changing dependencies, redeploy with the launcher's `deploy` command so the build step runs.
+- The service must stay light: models load in the worker on demand and the worker is stopped when idle.
+  This machine has restarted from memory exhaustion before; do not make the models resident.
+- A result must never state a verdict. Keep the bands tied to the stricter human reference.
+- `results/calibration.json` is derived from committed scores; rebuild it with `calibration` whenever the
+  long-set scores or the classifier change. The private reference lives in `RAW_DATA_DIR/private`.
 
 ## Setup and validation
 
