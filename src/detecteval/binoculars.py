@@ -76,7 +76,8 @@ def statistics_torch(observer_logits, performer_logits, tokens) -> dict:
             "log_ppl": -log_likelihood / count, "tokens": count}
 
 
-def main() -> None:
+def run(items: list[dict], path) -> None:
+    """Score ``items`` and append to ``path``; keys already in the file are skipped."""
     config.cap_gpu_memory("0.45")
     import torch
     from transformers import AutoModelForCausalLM, AutoTokenizer
@@ -90,10 +91,9 @@ def main() -> None:
     models = [AutoModelForCausalLM.from_pretrained(name, dtype=dtype).to(device).eval()
               for name in (OBSERVER, PERFORMER)]
 
-    path = config.RESULTS_DIR / "detectors" / "binoculars.jsonl"
     path.parent.mkdir(parents=True, exist_ok=True)
     finished = done_keys(path)
-    todo = sorted((item for item in all_items() if item["key"] not in finished), key=lambda item: len(item["text"]))
+    todo = sorted((item for item in items if item["key"] not in finished), key=lambda item: len(item["text"]))
     with open(path, "a") as handle, torch.no_grad():
         for start in range(0, len(todo), BATCH):
             chunk = todo[start:start + BATCH]
@@ -114,6 +114,10 @@ def main() -> None:
             if (start // BATCH) % 200 == 0:
                 print(f"{min(start + BATCH, len(todo))}/{len(todo)}", flush=True)
     print("done ->", path)
+
+
+def main() -> None:
+    run(all_items(), config.RESULTS_DIR / "detectors" / "binoculars.jsonl")
 
 
 if __name__ == "__main__":

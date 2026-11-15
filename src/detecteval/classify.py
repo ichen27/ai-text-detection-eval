@@ -17,20 +17,19 @@ MAX_TOKENS = 512      # the encoder's limit, about 380 words; longer texts are j
 BATCH = 8
 
 
-def main() -> None:
+def run(recipes: list[str], items: list[dict], directory) -> None:
+    """Score ``items`` with each trained recipe and write ``directory``/classifier-<recipe>.jsonl."""
     config.cap_gpu_memory()
     import torch
     from transformers import AutoModelForSequenceClassification, AutoTokenizer
 
-    parser = argparse.ArgumentParser(description=__doc__.split("\n")[0])
-    parser.add_argument("recipes", nargs="+", choices=["raid", "mirrors"])
-    args = parser.parse_args()
     device = config.torch_device()
-    items = sorted(all_items(), key=lambda item: len(item["text"]))
-    for recipe in args.recipes:
+    directory.mkdir(parents=True, exist_ok=True)
+    items = sorted(items, key=lambda item: len(item["text"]))
+    for recipe in recipes:
         tokenizer = AutoTokenizer.from_pretrained(model_dir(recipe))
         model = AutoModelForSequenceClassification.from_pretrained(model_dir(recipe)).to(device).eval()
-        path = config.RESULTS_DIR / "detectors" / f"classifier-{recipe}.jsonl"
+        path = directory / f"classifier-{recipe}.jsonl"
         rows = []
         with torch.no_grad():
             for start in range(0, len(items), BATCH):
@@ -47,6 +46,13 @@ def main() -> None:
             for row in rows:
                 handle.write(json.dumps(row) + "\n")
         print(recipe, len(rows), "->", path)
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(description=__doc__.split("\n")[0])
+    parser.add_argument("recipes", nargs="+", choices=["raid", "mirrors"])
+    args = parser.parse_args()
+    run(args.recipes, all_items(), config.RESULTS_DIR / "detectors")
 
 
 if __name__ == "__main__":

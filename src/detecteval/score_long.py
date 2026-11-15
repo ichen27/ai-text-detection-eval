@@ -17,11 +17,12 @@ from .questions import QUESTIONS, score_of
 BATCH = 12
 
 
-def score(model: str, question: str, rungs: list[int]) -> None:
-    path = config.RESULTS_DIR / "scores_long" / f"{model}.{question}.jsonl"
+def score(model: str, question: str, rungs: list[int], items: list[dict] | None = None, path=None) -> None:
+    """Score the long set, or ``items`` when given, appending to ``path``; finished keys are skipped."""
+    path = path or config.RESULTS_DIR / "scores_long" / f"{model}.{question}.jsonl"
     path.parent.mkdir(parents=True, exist_ok=True)
     finished = done_keys(path)
-    todo = [item for item in long_items(rungs) if item["key"] not in finished]
+    todo = [item for item in (long_items(rungs) if items is None else items) if item["key"] not in finished]
     workers, failures = WorkersAI(), 0
     with open(path, "a") as handle:
         for start in range(0, len(todo), BATCH):

@@ -225,6 +225,23 @@ Verified here: the pipeline ran through a private MCP gateway in front of Cloudf
 Pointing `MCP_URL` directly at `https://mcp.cloudflare.com/mcp` uses the same tool and should behave the
 same, but that path was not run.
 
+## Testing your own writing
+
+Private documents written before language models were common are the cleanest test of false accusations:
+they cannot be in any model's training data and cannot be AI-assisted.
+
+1. Create `RAW_DATA_DIR/private/manifest.jsonl` with one JSON object per line:
+   `{"id": "doc-001", "group": "own_pre_ai", "text": "..."}`. `group` is free text; use one group for
+   writing you are sure is unassisted and another for anything else.
+2. `uv run python -m detecteval.private_eval clef` (paid; sends each text to Clef on your Workers AI
+   account), then `uv run python -m detecteval.private_eval local` (needs `uv sync --group ml` and the
+   trained classifiers).
+3. `uv run python -m detecteval.private_eval report` writes `results/private_writing.md`.
+
+The flagging bar and combination weights are the ones set on the long set's calibration half, so your
+documents play no part in choosing them. Texts and per-document scores stay under `RAW_DATA_DIR/private`;
+the report contains counts and rates only.
+
 ### Cost
 
 Paid calls go to Workers AI. The first study's committed scores account for about 4 million input tokens

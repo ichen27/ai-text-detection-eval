@@ -20,6 +20,7 @@ classifier fine-tuned on examples. It is an evaluation harness, not a detector p
     `build_long_set`, `generate_long`, `score_long`.
   - Local detectors: `binoculars`; `generate_mirrors`, `train_data`, `train_classifier`, `classify`.
   - Comparison of everything on held-out halves: `compare`, `compare_report`.
+  - Private writing: `private_eval` scores documents listed in `RAW_DATA_DIR/private/manifest.jsonl`.
 - `data/` — both evaluation sets, the texts generated for them, and the training mirrors (committed).
 - `results/` — scores per detector, summaries, reports and figures (committed deliverables).
 - Raw third-party downloads and trained model weights live outside Git in `RAW_DATA_DIR` (default
@@ -40,6 +41,8 @@ classifier fine-tuned on examples. It is an evaluation harness, not a detector p
   writes one row per key, so `compare` can join them.
 - `generate_long` plans humanized rewrites from the fresh texts that exist when it runs. To retry failed
   fresh texts later, rerun only the fresh jobs, or the rewrite sample changes.
+- Private documents, their titles, ids and per-document scores never enter the repository. Only the
+  aggregate report from `private_eval report` is committed.
 - Long-set texts carry a `split`. Set thresholds and fit combinations on `calib`; report on `test`.
 - Training data must never overlap evaluation data. `train_data` excludes every evaluation source
   document, uses separate Stack Exchange sites, and leaves four current generators and all student
