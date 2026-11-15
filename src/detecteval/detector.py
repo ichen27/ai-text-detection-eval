@@ -108,7 +108,7 @@ def summarise(passages: list[dict]) -> dict:
         reading = f"All {total} passages read as AI-like."
     elif ai_like:
         verb = "reads" if ai_like == 1 else "read"
-        label, reading = "Mixed", f"{ai_like} of {total} passages {verb} as AI-like; the rest do not."
+        label, reading = "Mixed", f"{ai_like} of {total} passages {verb} as AI-like."
     elif counts["weak"]:
         label = "Mostly human-like"
         verb = "leans" if counts["weak"] == 1 else "lean"
