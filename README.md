@@ -269,6 +269,38 @@ Verified here: the pipeline ran through a private MCP gateway in front of Cloudf
 Pointing `MCP_URL` directly at `https://mcp.cloudflare.com/mcp` uses the same tool and should behave the
 same, but that path was not run.
 
+## Use the detector: web app and MCP server
+
+The trained classifier, with Binoculars as an optional second opinion, runs as a small local service.
+It has a web page and an MCP endpoint. It does not include Clef, which flagged too much real student
+writing to be shown as a signal. Nothing leaves the machine.
+
+![The detector page with one AI passage and one human passage](docs/screenshots/detector-app.png)
+
+A result never says "AI" or "human". For each passage of up to 500 words it gives a band (none, weak,
+moderate, strong) and the numbers behind it: how many human reference texts score at least as high, and
+how many AI reference texts score at most as high. The band follows the stricter human reference.
+
+```sh
+uv sync --group ml --group serve
+# put the trained classifier in RAW_DATA_DIR/models/mirrors (release v0.3.0, see Artifacts)
+uv run python -m detecteval.calibration      # reference scores from the committed results
+uv run python -m detecteval.serve            # http://127.0.0.1:8941
+```
+
+- **Web page:** `http://127.0.0.1:8941/`. JSON API: `POST /api/detect` with `{"text": "...", "binoculars": false}`.
+- **MCP:** streamable HTTP at `http://127.0.0.1:8941/mcp`, tools `detect_ai_text` and
+  `about_ai_text_detector`. The endpoint answers only requests addressed to localhost, so a reverse proxy
+  that serves the page under another hostname does not expose it.
+- **Memory:** the service itself is about 50 MB. The models run in a worker process that starts on the
+  first request (10 to 30 seconds) and is stopped after five idle minutes. The classifier needs about
+  0.5 GB; Binoculars adds about 3 GB and is skipped when the machine is short of memory.
+- **A harder human reference:** if you have run the private-writing test, `python -m detecteval.calibration
+  --private` adds your own certainly-human documents as a second reference. It stays outside the repository.
+
+[launcher.json](launcher.json) is the manifest this project's own deployment uses with a personal app
+launcher; its paths are specific to that machine and are not needed to run the service.
+
 ## Testing your own writing
 
 Private documents written before language models were common are the cleanest test of false accusations:
@@ -304,6 +336,7 @@ Binoculars and the classifier run locally: about 30 minutes and 60 minutes on an
 | Scores per detector | [results/scores/](results/scores/), [results/scores_long/](results/scores_long/), [results/detectors/](results/detectors/) | JSON Lines | `score`, `score_long`, `binoculars`, `classify` |
 | Reports | [results/report.md](results/report.md), [results/comparison.md](results/comparison.md), [results/private_writing.md](results/private_writing.md), with `.json` twins | Markdown, JSON | `report`, `compare`, `private_eval report` |
 | Figures | [results/figures/](results/figures/) | PNG | `report`, `compare` |
+| Reference scores for the detector app | [results/calibration.json](results/calibration.json) | JSON | `calibration` |
 | Trained classifiers (2 × 306 MB) | [release v0.3.0](https://github.com/ichen27/ai-text-detection-eval/releases/tag/v0.3.0) | Hugging Face model folders, gzipped tar | Extract into `RAW_DATA_DIR/models/`, then `python -m detecteval.classify raid mirrors`; or retrain with `train_classifier` |
 
 SHA-256 of the release files: `classifier-raid.tar.gz` `81ae99d8aa214fe596a5799cac1b5a19c8f67da5989284e9639a3431d535a9f5`,
@@ -322,7 +355,9 @@ results/          report.md, summary.json      first study
                   private_writing.md, .json        false accusations on private writing (aggregates only)
                   scores/, scores_long/, detectors/   raw scores per detector
                   figures/
-tests/            unit tests for metrics, text preparation, splits and detector statistics
+launcher.json     deployment manifest for the detector app (machine-specific)
+docs/screenshots/ the detector page
+tests/            unit tests for metrics, text preparation, splits, detector statistics and result bands
 ci/run.sh         single lint-and-test entry point used locally and in CI
 ```
 

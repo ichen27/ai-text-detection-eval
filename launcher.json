@@ -1,0 +1,19 @@
+{
+  "id": "ai-detector",
+  "name": "AI Text Detector",
+  "description": "Scores how AI-like a text is and how often human writing scores the same. Runs locally.",
+  "icon": "AI",
+  "color": "#d9e4f2",
+  "tags": ["tools", "writing"],
+  "favorite": false,
+  "cwd": "/Volumes/SamsungSSD1/code/ai-text-detection-eval",
+  "build": [
+    ["/usr/bin/env", "UV_PROJECT_ENVIRONMENT=/Volumes/SamsungSSD1/tools/ai-text-detection/venv",
+     "/Users/chenagent/.local/bin/uv", "sync", "--locked", "--no-dev", "--group", "ml", "--group", "serve"]
+  ],
+  "command": ["/Volumes/SamsungSSD1/tools/ai-text-detection/venv/bin/python", "-m", "detecteval.serve"],
+  "port": 8941,
+  "healthPath": "/health",
+  "runtime": "native",
+  "envFile": "/Volumes/SamsungSSD1/tools/ai-text-detection/app.env"
+}

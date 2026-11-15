@@ -10,6 +10,8 @@ dependencies = ["numpy>=1.26", "matplotlib>=3.8", "duckdb>=1.1"]
 dev = ["pytest>=8", "ruff>=0.6"]
 # Local detectors (Binoculars and the trained classifier). Not needed for the tests or the report.
 ml = ["torch>=2.6", "transformers>=4.48", "accelerate>=1.2"]
+# The detector web app and MCP server. Needs the ml group as well, for the model worker.
+serve = ["starlette>=0.40", "uvicorn>=0.30", "mcp>=2"]
 
 [build-system]
 requires = ["hatchling"]

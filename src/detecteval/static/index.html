@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI text detector</title>
+<style>
+  :root {
+    --paper: #eef1f4; --surface: #ffffff; --ink: #16202b; --muted: #5b6673; --rule: #d5dbe2;
+    --human: #2a78d6; --ai: #eb6834; --zone-5: #fbe3d6; --zone-1: #f5c3a8; --focus: #16202b;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --paper: #10151b; --surface: #171e26; --ink: #e6eaee; --muted: #9aa6b2; --rule: #2a333d;
+      --human: #5b9ae6; --ai: #f0875c; --zone-5: #3b2a22; --zone-1: #5a3524; --focus: #e6eaee;
+      color-scheme: dark;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--paper); color: var(--ink);
+    font-family: "Avenir Next", "Segoe UI", system-ui, sans-serif; font-size: 1rem; line-height: 1.5;
+    font-variant-numeric: tabular-nums;
+  }
+  main { max-width: 46rem; margin: 0 auto; padding: 2.5rem 1rem 4rem; }
+  h1 { font-size: 2rem; line-height: 1.15; font-weight: 600; letter-spacing: -0.01em; margin: 0 0 0.5rem; }
+  h2 { font-size: 1.125rem; font-weight: 600; margin: 2.5rem 0 0.5rem; }
+  p { margin: 0 0 1rem; max-width: 40rem; }
+  .lede { color: var(--muted); }
+  label[for="text"] { display: block; font-weight: 600; margin: 1.75rem 0 0.4rem; }
+  textarea {
+    width: 100%; min-height: 15rem; padding: 0.85rem 1rem; resize: vertical;
+    font: inherit; color: inherit; background: var(--surface);
+    border: 1px solid var(--rule); border-radius: 6px;
+  }
+  textarea:focus-visible, button:focus-visible, input:focus-visible, summary:focus-visible {
+    outline: 2px solid var(--focus); outline-offset: 2px;
+  }
+  .actions { display: flex; flex-wrap: wrap; align-items: center; gap: 0.75rem 1.25rem; margin-top: 0.75rem; }
+  button {
+    font: inherit; font-weight: 600; color: var(--surface); background: var(--ink);
+    border: 0; border-radius: 6px; padding: 0.6rem 1.15rem; cursor: pointer;
+  }
+  button[disabled] { opacity: 0.55; cursor: progress; }
+  .option { display: flex; align-items: center; gap: 0.45rem; color: var(--muted); }
+  .count { margin-left: auto; color: var(--muted); font-size: 0.875rem; }
+  .status { color: var(--muted); font-size: 0.875rem; min-height: 1.4rem; margin-top: 0.6rem; }
+  .error { color: var(--ink); background: var(--zone-5); border-left: 3px solid var(--ai); padding: 0.7rem 0.9rem; }
+  .reading { font-size: 1.25rem; line-height: 1.35; font-weight: 600; max-width: 36rem; margin: 0 0 0.25rem; }
+  .passage { border-top: 1px solid var(--rule); padding: 1.25rem 0 0.5rem; }
+  .passage h3 { font-size: 1rem; font-weight: 600; margin: 0; }
+  .start { color: var(--muted); font-size: 0.875rem; margin: 0.15rem 0 0.9rem; }
+  .detector { margin: 0 0 1.25rem; }
+  .detector-head { display: flex; flex-wrap: wrap; gap: 0.25rem 1rem; justify-content: space-between; }
+  .detector-name { font-weight: 600; }
+  .band { color: var(--muted); }
+  .band[data-band="moderate"], .band[data-band="strong"] { color: var(--ink); font-weight: 600; }
+  .track { position: relative; height: 2.6rem; margin: 0.5rem 0 0.2rem; }
+  .rail {
+    position: absolute; left: 0; right: 0; top: 0.55rem; height: 0.7rem; border-radius: 3px;
+    background: linear-gradient(to right, var(--rule) 0 70%, var(--zone-5) 70% 90%, var(--zone-1) 90% 100%);
+  }
+  .tick { position: absolute; top: 0.3rem; height: 1.2rem; width: 1px; background: var(--muted); opacity: 0.6; }
+  .tick span { position: absolute; top: 1.3rem; transform: translateX(-50%); font-size: 0.75rem; color: var(--muted); white-space: nowrap; }
+  .marker { position: absolute; top: 0.2rem; width: 0.9rem; height: 1.4rem; margin-left: -0.45rem; border-radius: 3px; }
+  .marker.public { background: var(--human); }
+  .marker.private { background: var(--surface); border: 2px solid var(--human); }
+  .facts { list-style: none; padding: 0; margin: 0.9rem 0 0; font-size: 0.9375rem; }
+  .facts li { display: flex; gap: 0.55rem; align-items: baseline; margin-bottom: 0.15rem; }
+  .key { flex: none; width: 0.7rem; height: 0.7rem; border-radius: 2px; transform: translateY(0.05rem); }
+  .key.public { background: var(--human); }
+  .key.private { border: 2px solid var(--human); }
+  .key.ai { background: var(--ai); }
+  .notes, .limits { color: var(--muted); font-size: 0.9375rem; padding-left: 1.1rem; }
+  .limits li, .notes li { margin-bottom: 0.3rem; max-width: 40rem; }
+  [hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<main>
+  <h1>AI text detector</h1>
+  <p class="lede">Paste writing to see how AI-like it scores, and how often real human writing scores the
+    same. Everything runs on this machine; the text is not sent anywhere.</p>
+
+  <form id="form">
+    <label for="text">Text to score</label>
+    <textarea id="text" name="text" spellcheck="false" placeholder="At least 63 words. 300 or more gives a much better reading."></textarea>
+    <div class="actions">
+      <button id="submit" type="submit">Score text</button>
+      <label class="option"><input id="binoculars" type="checkbox"> Add a second opinion (slower)</label>
+      <span class="count" id="count">0 words</span>
+    </div>
+    <div class="status" id="status" role="status" aria-live="polite"></div>
+  </form>
+
+  <section id="result" hidden aria-live="polite">
+    <h2>Reading</h2>
+    <p class="reading" id="reading"></p>
+    <ul class="notes" id="notes"></ul>
+    <div id="passages"></div>
+  </section>
+
+  <h2>What this can and cannot tell you</h2>
+  <ul class="limits" id="limits">
+    <li>This is a score with error rates, not proof. Do not use it on its own to accuse anyone.</li>
+  </ul>
+</main>
+
+<script>
+const $ = (id) => document.getElementById(id);
+const BAND_TEXT = {
+  none: "In the usual range for human writing",
+  weak: "Slightly unusual for human writing",
+  moderate: "Unusual for human writing",
+  strong: "Very unusual for human writing",
+};
+const DETECTOR_NAME = {"classifier-mirrors": "Trained classifier", "binoculars": "Second opinion (Binoculars)"};
+
+// The track zooms in on the top of the human range, where the decision is made.
+function position(percentile) {
+  const stops = [[0, 0], [80, 40], [95, 70], [99, 90], [100, 100]];
+  for (let i = 1; i < stops.length; i++) {
+    const [p0, x0] = stops[i - 1], [p1, x1] = stops[i];
+    if (percentile <= p1) return x0 + (percentile - p0) / (p1 - p0) * (x1 - x0);
+  }
+  return 100;
+}
+const markerAt = (percentile) => Math.min(98.6, Math.max(1.4, position(percentile)));   // keep markers on the rail
+// Whole percentages, with one decimal near the ends where a rounded 0% or 100% would mislead.
+const pct = (share) => {
+  const value = share * 100;
+  return ((value > 0 && value < 1) || (value > 99 && value < 100) ? value.toFixed(1) : Math.round(value)) + "%";
+};
+const higherThan = (share, count, what) => share <= 0
+  ? `Scores higher than all ${count} ${what}.`
+  : `Scores higher than ${pct(1 - share)} of ${count} ${what}.`;
+function el(tag, attrs = {}, ...children) {
+  const node = document.createElement(tag);
+  for (const [key, value] of Object.entries(attrs)) {
+    if (key === "class") node.className = value;
+    else if (key === "style") node.style.cssText = value;
+    else node.setAttribute(key, value);
+  }
+  node.append(...children);
+  return node;
+}
+
+function renderDetector(name, d) {
+  const below = (share) => 100 * (1 - share);
+  const shares = d.human_texts_scoring_at_least_this, sizes = d.human_reference_sizes;
+  const track = el("div", {class: "track", role: "img",
+    "aria-label": `Scores higher than ${pct(1 - shares.public)} of public human texts`},
+    el("div", {class: "rail"}),
+    ...[[80, "80%"], [95, "95%"], [99, "99%"]].map(([p, label]) =>
+      el("div", {class: "tick", style: `left:${position(p)}%`}, el("span", {}, label))),
+    el("div", {class: "marker public", style: `left:${markerAt(below(shares.public))}%`}));
+  const facts = el("ul", {class: "facts"},
+    el("li", {}, el("span", {class: "key public"}),
+      higherThan(shares.public, sizes.public, "public human texts")));
+  if (shares.private !== undefined) {
+    track.append(el("div", {class: "marker private", style: `left:${markerAt(below(shares.private))}%`}));
+    facts.append(el("li", {}, el("span", {class: "key private"}),
+      higherThan(shares.private, sizes.private, "passages from one student's pre-ChatGPT essays")));
+  }
+  facts.append(el("li", {}, el("span", {class: "key ai"}),
+    `${pct(d.ai_texts_scoring_at_most_this)} of ${d.ai_reference_size} AI texts score this low or lower.`));
+  return el("div", {class: "detector"},
+    el("div", {class: "detector-head"},
+      el("span", {class: "detector-name"}, DETECTOR_NAME[name] || name),
+      el("span", {class: "band", "data-band": d.band}, BAND_TEXT[d.band])),
+    track, facts);
+}
+
+function render(result) {
+  $("reading").textContent = result.summary.reading;
+  $("notes").replaceChildren(...result.notes.map((note) => el("li", {}, note)));
+  $("passages").replaceChildren(...result.passages.map((p) => {
+    const length = p.words <= p.scored_at_words ? `${p.words} words`
+      : `${p.words} words, scored on the first ${p.scored_at_words}`;
+    return el("div", {class: "passage"},
+      el("h3", {}, result.passages.length > 1 ? `Passage ${p.index}, ${length}` : `${length}`),
+      el("p", {class: "start"}, `Begins: “${p.start}…”`),
+      ...Object.entries(p.detectors).map(([name, d]) => renderDetector(name, d)));
+  }));
+  $("limits").replaceChildren(...result.limits.map((limit) => el("li", {}, limit)));
+  $("result").hidden = false;
+}
+
+function showError(message) {
+  $("status").replaceChildren(el("div", {class: "error"}, message));
+}
+
+$("text").addEventListener("input", () => {
+  const words = $("text").value.trim().split(/\s+/).filter(Boolean).length;
+  $("count").textContent = `${words} word${words === 1 ? "" : "s"}`;
+});
+
+$("form").addEventListener("submit", async (event) => {
+  event.preventDefault();
+  const button = $("submit");
+  button.disabled = true;
+  button.textContent = "Scoring…";
+  $("status").textContent = "Starting the models can take up to a minute the first time.";
+  try {
+    const response = await fetch("api/detect", {
+      method: "POST", headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({text: $("text").value, binoculars: $("binoculars").checked}),
+    });
+    const result = await response.json();
+    if (!result.ok) {
+      $("result").hidden = true;
+      showError(result.error || "Could not score the text.");
+    } else {
+      $("status").textContent = "";
+      render(result);
+    }
+  } catch (error) {
+    showError("The detector did not answer. Check that the app is running, then score the text again.");
+  } finally {
+    button.disabled = false;
+    button.textContent = "Score text";
+  }
+});
+
+fetch("api/info").then((r) => r.json()).then((info) => {
+  $("limits").replaceChildren(...info.limits.map((limit) => el("li", {}, limit)));
+}).catch(() => {});
+</script>
+</body>
+</html>
