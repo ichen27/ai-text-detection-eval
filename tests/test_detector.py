@@ -42,27 +42,36 @@ def test_long_text_is_capped_and_says_so():
     assert len(passages) == detector.MAX_PASSAGES and truncated is True
 
 
-@pytest.mark.parametrize(("score", "band"), [(99.5, "strong"), (96.0, "moderate"), (85.0, "weak"), (40.0, "none")])
-def test_bands_follow_the_share_of_human_texts_scoring_as_high(score, band):
-    assert detector.interpret("classifier-mirrors", 300, score, CALIBRATION)["band"] == band
+@pytest.mark.parametrize(("score", "band"), [(120.0, "strong"), (20.0, "none")])
+def test_band_follows_the_ai_likelihood(score, band):
+    reading = detector.interpret("classifier-mirrors", 300, score, CALIBRATION)
+    assert reading["band"] == band
+    assert 1 <= reading["ai_likelihood_percent"] <= 99            # never certain either way
 
 
-def test_the_stricter_reference_decides_the_band():
-    calibration = {**CALIBRATION, "private": {"classifier-mirrors": {"300": {"human": [98.0, 99.0, 99.0, 99.8]}}}}
-    reading = detector.interpret("classifier-mirrors", 300, 99.5, calibration)
-    assert reading["human_texts_scoring_at_least_this"] == {"public": 0.0, "private": 0.25}
-    assert reading["band"] == "none"                             # a quarter of the private texts score this high
+def test_likelihood_rises_with_the_score():
+    percents = [detector.interpret("classifier-mirrors", 300, float(score), CALIBRATION)["ai_likelihood_percent"]
+                for score in range(0, 150, 10)]
+    assert percents == sorted(percents) and percents[0] < 10 and percents[-1] > 90
+
+
+def test_a_private_human_reference_lowers_the_likelihood():
+    private = {"classifier-mirrors": {"300": {"human": [float(v) for v in range(60, 100)]}}}
+    public_only = detector.interpret("classifier-mirrors", 300, 80.0, CALIBRATION)
+    with_private = detector.interpret("classifier-mirrors", 300, 80.0, {**CALIBRATION, "private": private})
+    assert with_private["ai_likelihood_percent"] < public_only["ai_likelihood_percent"]
+    assert with_private["human_texts_scoring_at_least_this"]["private"] == 0.5
 
 
 def test_result_never_names_a_verdict():
     passages, truncated = detector.split_passages(words(320))
-    result = detector.build_result(passages, truncated, {"classifier-mirrors": [99.5], "binoculars": None},
+    result = detector.build_result(passages, truncated, {"classifier-mirrors": [120.0], "binoculars": None},
                                    CALIBRATION)
     assert result["ok"] and result["summary"]["bands"]["strong"] == 1
     assert "binoculars" not in result["passages"][0]["detectors"]
     text = str({key: value for key, value in result.items() if key != "limits"}).lower()
     assert "written by ai" not in text and "is human" not in text       # labels describe the score, not the author
-    assert result["summary"]["label"] == "Strongly AI-like"
+    assert result["summary"]["label"] == "Strongly AI-like" and result["summary"]["ai_likelihood_percent"] >= 85
 
 
 @pytest.mark.parametrize(("share", "odds"), [(0.5, 2), (0.034, 30), (0.005, 200), (0.11, 10), (1.0, 2)])
@@ -79,8 +88,12 @@ def test_plain_reading_says_how_common_the_score_is():
     assert detector.plain_reading("none", 0.6, 500, 0.005).endswith("Few AI texts score this low (about 1 in 200).")
 
 
-def reading(band):
-    return {"detectors": {"classifier-mirrors": {"band": band, "label": detector.LABELS[band], "plain": "x"}}}
+PERCENT = {"none": 10, "weak": 45, "moderate": 70, "strong": 95}
+
+
+def reading(band, words=300):
+    return {"words": words, "detectors": {"classifier-mirrors": {
+        "band": band, "label": detector.LABELS[band], "plain": "x", "ai_likelihood_percent": PERCENT[band]}}}
 
 
 @pytest.mark.parametrize(("bands", "label"), [
@@ -96,3 +109,18 @@ def test_summary_sentence_agrees_in_number():
 
     assert sentence("strong", "none", "weak").startswith("1 of 3 passages reads")
     assert sentence("strong", "moderate", "none").startswith("2 of 3 passages read ")
+
+
+def test_whole_text_likelihood_weights_passages_by_length():
+    summary = detector.summarise([reading("strong", words=500), reading("none", words=100)])
+    assert summary["ai_likelihood_percent"] == round((95 * 500 + 10 * 100) / 600)
+
+
+def test_probability_curve_never_decreases_and_balances_the_classes():
+    from detecteval.calibration import likelihood, probability_curve
+
+    curve = probability_curve([[0.0, 1.0, 2.0, 3.0]], [2.5, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0])
+    assert curve[1] == sorted(curve[1])
+    assert likelihood(curve, -5.0) == 0.01 and likelihood(curve, 50.0) == 0.99
+    # One human at 3.0 and one AI text at 2.5 overlap: with equal class weight the human counts double.
+    assert 0.2 < likelihood(curve, 2.75) < 0.5

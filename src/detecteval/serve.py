@@ -57,7 +57,9 @@ ABOUT = {
                       "models. Optional second opinion; weak on short text from current models.",
     },
     "measured": "At 300 words the classifier caught 91% of AI text with the bar set to flag 5% of public "
-                "human texts. On one student's private pre-ChatGPT essays that same bar flagged 8%.",
+                "human texts. On one student's private pre-ChatGPT essays that same bar flagged 8%. On "
+                "held-out texts, passages given an AI likelihood of 85% or more were AI-written about 98% of "
+                "the time, and those given under 30% about 3% of the time.",
     "limits": detector.LIMITS,
 }
 
@@ -223,12 +225,14 @@ mcp = MCPServer(
 async def detect_ai_text(text: str, use_binoculars: bool = False) -> dict:
     """Score how AI-like a piece of English prose is. Runs locally; the text is not sent anywhere.
 
-    The text is cut into passages of up to 500 words. ``summary.label`` and ``summary.reading`` describe the
-    whole text; each passage has a ``label`` (Human-like, Slightly AI-like, AI-like, Strongly AI-like) and
-    a ``plain`` sentence saying how often human writing scores that high, for example "Only about 1 in 30
-    human texts score this high." Labels describe the score, not the author: report them with that
-    sentence and never as proof. Needs at least 63 words; under 150 words it is unreliable. Text a person
-    wrote and an AI then polished usually scores as AI-like. Set use_binoculars for a slower second opinion.
+    Returns ``summary.ai_likelihood_percent`` (1 to 99) with ``summary.label`` and ``summary.reading`` for
+    the whole text, and the same for each passage of up to 500 words, plus a ``plain`` sentence saying how
+    often human writing scores that high. The percentage is the chance the text is AI-written if AI and
+    human text were equally likely beforehand; where most text is human-written the real chance is lower.
+    On held-out texts, passages given 85% or more were AI-written about 98% of the time and those under
+    30% about 3% of the time. Report the number with that caveat and never as proof. Needs at least 63
+    words; under 150 words it is unreliable. Text a person wrote and an AI then polished usually scores
+    as AI-like. Set use_binoculars for a slower second opinion.
     """
     try:
         return await detect(text, use_binoculars)
