@@ -1,7 +1,8 @@
 [project]
 name = "detecteval"
 version = "0.1.0"
-description = "Zero-shot evaluation of decision models as AI-generated-text detectors"
+description = "Proofmark: AI-likelihood scores for writing with measured error rates, and the evaluation behind them"
+license = "MIT"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = ["numpy>=1.26", "matplotlib>=3.8", "duckdb>=1.1"]
