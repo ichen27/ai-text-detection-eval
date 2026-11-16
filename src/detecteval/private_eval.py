@@ -13,7 +13,9 @@ Put the documents in RAW_DATA_DIR/private/manifest.jsonl, one JSON object per li
 
     {"id": "doc-001", "group": "own_pre_ai", "text": "...", "modified": "2021-04-02"}
 
-``group`` is free text; every group is reported separately. The texts and the per-document scores stay
+``group`` is free text; every group is reported separately, except groups named with ``--omit-group``
+on the report step (use it for documents whose authorship you are not sure of). The texts and the
+per-document scores stay
 under RAW_DATA_DIR/private, outside the repository. The report holds counts and rates only: no text,
 no titles and no document ids. The flagging bar and the combination weights are the ones set on the
 calibration half of the long set, so the private documents play no part in choosing them.
@@ -75,10 +77,11 @@ def rate(values: np.ndarray, threshold: float, documents: list | None = None) ->
     return out
 
 
-def analyse(target_fpr: float = 0.05) -> dict:
+def analyse(target_fpr: float = 0.05, omit: set[str] | None = None) -> dict:
+    """``omit`` names groups to leave out entirely, for example ones whose authorship is uncertain."""
     texts, public = compare.load_texts(), compare.load_scores()
     private = load_private_scores()
-    manifest = private_documents()
+    manifest = [row for row in private_documents() if row["group"] not in (omit or set())]
     groups = {row["id"]: row["group"] for row in manifest}
     source = {row["id"]: row.get("doc", row["id"]) for row in manifest}     # passages cut from one document
     out: dict = {"target_fpr": target_fpr, "passages": dict(collections.Counter(groups.values())),
@@ -210,6 +213,8 @@ def main() -> None:
     parser.add_argument("step", choices=["clef", "local", "report"])
     parser.add_argument("--skip-group", action="append", default=[],
                         help="with 'clef': keep this group's texts on this machine (may be repeated)")
+    parser.add_argument("--omit-group", action="append", default=[],
+                        help="with 'report': leave this group out of the written report (may be repeated)")
     args = parser.parse_args()
     config.load_env()
     if args.step == "clef":
@@ -222,7 +227,7 @@ def main() -> None:
         binoculars.run(private_items(), scores_dir() / "binoculars.jsonl")
         classify.run(["raid", "mirrors"], private_items(), scores_dir())
     else:
-        summary = analyse()
+        summary = analyse(omit=set(args.omit_group))
         (config.RESULTS_DIR / "private_writing.json").write_text(json.dumps(summary, indent=1) + "\n")
         (config.RESULTS_DIR / "private_writing.md").write_text(markdown(summary))
         print(markdown(summary))
