@@ -2,15 +2,13 @@
  "target_fpr": 0.05,
  "passages": {
   "own_pre_ai": 60,
-  "own_recent": 99,
   "own_school_undated": 82,
   "own_journal_2024": 66
  },
  "documents": {
   "own_journal_2024": 1,
-  "own_pre_ai": 32,
   "own_school_undated": 59,
-  "own_recent": 61
+  "own_pre_ai": 32
  },
  "rungs": {
   "75": {
@@ -35,17 +33,6 @@
       ],
       "documents": 32,
       "documents_flagged": 15
-     },
-     "own_recent": {
-      "n": 99,
-      "flagged": 32,
-      "share": 0.32323232323232326,
-      "ci95": [
-       0.23919862826396276,
-       0.4204721664339027
-      ],
-      "documents": 61,
-      "documents_flagged": 26
      },
      "own_school_undated": {
       "n": 82,
@@ -81,17 +68,6 @@
       ],
       "documents": 32,
       "documents_flagged": 5
-     },
-     "own_recent": {
-      "n": 99,
-      "flagged": 20,
-      "share": 0.20202020202020202,
-      "ci95": [
-       0.13475627715378938,
-       0.29154591962261234
-      ],
-      "documents": 61,
-      "documents_flagged": 18
      },
      "own_school_undated": {
       "n": 82,
@@ -138,17 +114,6 @@
       ],
       "documents": 32,
       "documents_flagged": 10
-     },
-     "own_recent": {
-      "n": 99,
-      "flagged": 26,
-      "share": 0.26262626262626265,
-      "ci95": [
-       0.18598028163201125,
-       0.3570062141051224
-      ],
-      "documents": 61,
-      "documents_flagged": 21
      },
      "own_school_undated": {
       "n": 82,
@@ -196,17 +161,6 @@
       "documents": 32,
       "documents_flagged": 7
      },
-     "own_recent": {
-      "n": 99,
-      "flagged": 30,
-      "share": 0.30303030303030304,
-      "ci95": [
-       0.2212615693494659,
-       0.3995144590281556
-      ],
-      "documents": 61,
-      "documents_flagged": 28
-     },
      "own_school_undated": {
       "n": 82,
       "flagged": 4,
@@ -252,17 +206,6 @@
       ],
       "documents": 32,
       "documents_flagged": 9
-     },
-     "own_recent": {
-      "n": 99,
-      "flagged": 32,
-      "share": 0.32323232323232326,
-      "ci95": [
-       0.23919862826396276,
-       0.4204721664339027
-      ],
-      "documents": 61,
-      "documents_flagged": 27
      },
      "own_school_undated": {
       "n": 82,
@@ -310,17 +253,6 @@
       "documents": 32,
       "documents_flagged": 22
      },
-     "own_recent": {
-      "n": 99,
-      "flagged": 50,
-      "share": 0.5050505050505051,
-      "ci95": [
-       0.4082299868548984,
-       0.6014937047251627
-      ],
-      "documents": 61,
-      "documents_flagged": 38
-     },
      "own_school_undated": {
       "n": 82,
       "flagged": 32,
@@ -355,17 +287,6 @@
       ],
       "documents": 32,
       "documents_flagged": 14
-     },
-     "own_recent": {
-      "n": 99,
-      "flagged": 49,
-      "share": 0.494949494949495,
-      "ci95": [
-       0.39850629527483744,
-       0.5917700131451018
-      ],
-      "documents": 61,
-      "documents_flagged": 38
      },
      "own_school_undated": {
       "n": 82,
@@ -404,17 +325,6 @@
       "documents": 32,
       "documents_flagged": 11
      },
-     "own_recent": {
-      "n": 99,
-      "flagged": 28,
-      "share": 0.2828282828282828,
-      "ci95": [
-       0.20351825976230095,
-       0.3783630022950766
-      ],
-      "documents": 61,
-      "documents_flagged": 24
-     },
      "own_school_undated": {
       "n": 82,
       "flagged": 25,
@@ -449,17 +359,6 @@
       ],
       "documents": 32,
       "documents_flagged": 7
-     },
-     "own_recent": {
-      "n": 99,
-      "flagged": 18,
-      "share": 0.18181818181818182,
-      "ci95": [
-       0.11821769885745204,
-       0.2691897315987058
-      ],
-      "documents": 61,
-      "documents_flagged": 14
      },
      "own_school_undated": {
       "n": 82,
@@ -507,17 +406,6 @@
       "documents": 32,
       "documents_flagged": 13
      },
-     "own_recent": {
-      "n": 99,
-      "flagged": 34,
-      "share": 0.3434343434343434,
-      "ci95": [
-       0.25731989006284084,
-       0.44124567095526857
-      ],
-      "documents": 61,
-      "documents_flagged": 26
-     },
      "own_school_undated": {
       "n": 82,
       "flagged": 11,
@@ -563,17 +451,6 @@
       ],
       "documents": 32,
       "documents_flagged": 5
-     },
-     "own_recent": {
-      "n": 99,
-      "flagged": 35,
-      "share": 0.35353535353535354,
-      "ci95": [
-       0.2664470798753757,
-       0.45156586430285567
-      ],
-      "documents": 61,
-      "documents_flagged": 31
      },
      "own_school_undated": {
       "n": 82,
@@ -621,17 +498,6 @@
       "documents": 32,
       "documents_flagged": 9
      },
-     "own_recent": {
-      "n": 99,
-      "flagged": 38,
-      "share": 0.3838383838383838,
-      "ci95": [
-       0.29408494593454726,
-       0.48227014772404997
-      ],
-      "documents": 61,
-      "documents_flagged": 31
-     },
      "own_school_undated": {
       "n": 82,
       "flagged": 6,
@@ -678,17 +544,6 @@
       "documents": 32,
       "documents_flagged": 24
      },
-     "own_recent": {
-      "n": 99,
-      "flagged": 45,
-      "share": 0.45454545454545453,
-      "ci95": [
-       0.3599919588990025,
-       0.5524948168804487
-      ],
-      "documents": 61,
-      "documents_flagged": 36
-     },
      "own_school_undated": {
       "n": 82,
       "flagged": 31,
@@ -723,17 +578,6 @@
       ],
       "documents": 32,
       "documents_flagged": 21
-     },
-     "own_recent": {
-      "n": 99,
-      "flagged": 59,
-      "share": 0.5959595959595959,
-      "ci95": [
-       0.4974671538075806,
-       0.6872829862135781
-      ],
-      "documents": 61,
-      "documents_flagged": 45
      },
      "own_school_undated": {
       "n": 82,
@@ -772,17 +616,6 @@
       "documents": 29,
       "documents_flagged": 15
      },
-     "own_recent": {
-      "n": 84,
-      "flagged": 42,
-      "share": 0.5,
-      "ci95": [
-       0.39543750035009767,
-       0.6045624996499024
-      ],
-      "documents": 54,
-      "documents_flagged": 33
-     },
      "own_school_undated": {
       "n": 65,
       "flagged": 20,
@@ -817,17 +650,6 @@
       ],
       "documents": 29,
       "documents_flagged": 2
-     },
-     "own_recent": {
-      "n": 84,
-      "flagged": 16,
-      "share": 0.19047619047619047,
-      "ci95": [
-       0.12078595196346183,
-       0.2872394027659602
-      ],
-      "documents": 54,
-      "documents_flagged": 14
      },
      "own_school_undated": {
       "n": 65,
@@ -875,17 +697,6 @@
       "documents": 29,
       "documents_flagged": 3
      },
-     "own_recent": {
-      "n": 84,
-      "flagged": 27,
-      "share": 0.32142857142857145,
-      "ci95": [
-       0.23125977350162447,
-       0.42721639268842665
-      ],
-      "documents": 54,
-      "documents_flagged": 21
-     },
      "own_school_undated": {
       "n": 65,
       "flagged": 8,
@@ -931,17 +742,6 @@
       ],
       "documents": 29,
       "documents_flagged": 4
-     },
-     "own_recent": {
-      "n": 84,
-      "flagged": 40,
-      "share": 0.47619047619047616,
-      "ci95": [
-       0.3727826732247559,
-       0.5816808156005842
-      ],
-      "documents": 54,
-      "documents_flagged": 35
      },
      "own_school_undated": {
       "n": 65,
@@ -989,17 +789,6 @@
       "documents": 29,
       "documents_flagged": 11
      },
-     "own_recent": {
-      "n": 84,
-      "flagged": 48,
-      "share": 0.5714285714285714,
-      "ci95": [
-       0.4647675967027547,
-       0.6718419368212247
-      ],
-      "documents": 54,
-      "documents_flagged": 36
-     },
      "own_school_undated": {
       "n": 65,
       "flagged": 7,
@@ -1046,17 +835,6 @@
       "documents": 29,
       "documents_flagged": 23
      },
-     "own_recent": {
-      "n": 84,
-      "flagged": 64,
-      "share": 0.7619047619047619,
-      "ci95": [
-       0.6606473307381485,
-       0.8402542921831097
-      ],
-      "documents": 54,
-      "documents_flagged": 45
-     },
      "own_school_undated": {
       "n": 65,
       "flagged": 28,
@@ -1091,17 +869,6 @@
       ],
       "documents": 29,
       "documents_flagged": 20
-     },
-     "own_recent": {
-      "n": 84,
-      "flagged": 65,
-      "share": 0.7738095238095238,
-      "ci95": [
-       0.6735289274916636,
-       0.8501409510169247
-      ],
-      "documents": 54,
-      "documents_flagged": 48
      },
      "own_school_undated": {
       "n": 65,
@@ -1140,17 +907,6 @@
       "documents": 25,
       "documents_flagged": 12
      },
-     "own_recent": {
-      "n": 72,
-      "flagged": 43,
-      "share": 0.5972222222222222,
-      "ci95": [
-       0.4818046137128726,
-       0.702790647990467
-      ],
-      "documents": 52,
-      "documents_flagged": 35
-     },
      "own_school_undated": {
       "n": 43,
       "flagged": 12,
@@ -1185,17 +941,6 @@
       ],
       "documents": 25,
       "documents_flagged": 3
-     },
-     "own_recent": {
-      "n": 72,
-      "flagged": 10,
-      "share": 0.1388888888888889,
-      "ci95": [
-       0.07722647811471899,
-       0.23713397841573391
-      ],
-      "documents": 52,
-      "documents_flagged": 7
      },
      "own_school_undated": {
       "n": 43,
@@ -1243,17 +988,6 @@
       "documents": 25,
       "documents_flagged": 6
      },
-     "own_recent": {
-      "n": 72,
-      "flagged": 28,
-      "share": 0.3888888888888889,
-      "ci95": [
-       0.2846554187000152,
-       0.5043785679247396
-      ],
-      "documents": 52,
-      "documents_flagged": 20
-     },
      "own_school_undated": {
       "n": 43,
       "flagged": 9,
@@ -1299,17 +1033,6 @@
       ],
       "documents": 25,
       "documents_flagged": 4
-     },
-     "own_recent": {
-      "n": 72,
-      "flagged": 39,
-      "share": 0.5416666666666666,
-      "ci95": [
-       0.42739664196707616,
-       0.6517156130486407
-      ],
-      "documents": 52,
-      "documents_flagged": 33
      },
      "own_school_undated": {
       "n": 43,
@@ -1357,17 +1080,6 @@
       "documents": 25,
       "documents_flagged": 7
      },
-     "own_recent": {
-      "n": 72,
-      "flagged": 43,
-      "share": 0.5972222222222222,
-      "ci95": [
-       0.4818046137128726,
-       0.702790647990467
-      ],
-      "documents": 52,
-      "documents_flagged": 32
-     },
      "own_school_undated": {
       "n": 43,
       "flagged": 13,
@@ -1414,17 +1126,6 @@
       "documents": 25,
       "documents_flagged": 14
      },
-     "own_recent": {
-      "n": 72,
-      "flagged": 49,
-      "share": 0.6805555555555556,
-      "ci95": [
-       0.5660743422203383,
-       0.7767454295144354
-      ],
-      "documents": 52,
-      "documents_flagged": 37
-     },
      "own_school_undated": {
       "n": 43,
       "flagged": 18,
@@ -1459,17 +1160,6 @@
       ],
       "documents": 25,
       "documents_flagged": 11
-     },
-     "own_recent": {
-      "n": 72,
-      "flagged": 53,
-      "share": 0.7361111111111112,
-      "ci95": [
-       0.6242391943879235,
-       0.8240635840344728
-      ],
-      "documents": 52,
-      "documents_flagged": 39
      },
      "own_school_undated": {
       "n": 43,

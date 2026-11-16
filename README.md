@@ -85,15 +85,15 @@ The public human texts above may be in the models' training data, and they are n
 detectors are mostly used on. So the detectors were also run on one student's private Google Docs, with
 the flagging bar left exactly where the public data put it (5% of public human texts). 300-word passages:
 
-| Detector | Public human texts | Private, dated before 30 Nov 2022 | Private school work, undated | Private journal, 2024 | Private, dated since (AI use unknown) |
-|---|---|---|---|---|---|
-| Clef 27B, asked | 5% | 42% (21 of 50) | 31% (20 of 65) | not run | 50% (42 of 84) |
-| Binoculars (0.5B pair) | 4% | 4% (2 of 50) | 6% (4 of 65) | 2% (1 of 65) | 19% (16 of 84) |
-| Classifier, RAID only | 3% | 6% (3 of 50) | 12% (8 of 65) | 2% (1 of 65) | 32% (27 of 84) |
-| Classifier, RAID + mirrors | 3% | 8% (4 of 50) | 6% (4 of 65) | 3% (2 of 65) | 48% (40 of 84) |
-| Binoculars + classifier | 6% | 22% (11 of 50) | 11% (7 of 65) | 2% (1 of 65) | 57% (48 of 84) |
-| Clef + Binoculars | 5% | 64% (32 of 50) | 43% (28 of 65) | not run | 76% (64 of 84) |
-| All three combined | 5% | 44% (22 of 50) | 29% (19 of 65) | not run | 77% (65 of 84) |
+| Detector | Public human texts | Private, dated before 30 Nov 2022 | Private school work, undated | Private journal, 2024 |
+|---|---|---|---|---|
+| Clef 27B, asked | 5% | 42% (21 of 50) | 31% (20 of 65) | not run |
+| Binoculars (0.5B pair) | 4% | 4% (2 of 50) | 6% (4 of 65) | 2% (1 of 65) |
+| Classifier, RAID only | 3% | 6% (3 of 50) | 12% (8 of 65) | 2% (1 of 65) |
+| Classifier, RAID + mirrors | 3% | 8% (4 of 50) | 6% (4 of 65) | 3% (2 of 65) |
+| Binoculars + classifier | 6% | 22% (11 of 50) | 11% (7 of 65) | 2% (1 of 65) |
+| Clef + Binoculars | 5% | 64% (32 of 50) | 43% (28 of 65) | not run |
+| All three combined | 5% | 44% (22 of 50) | 29% (19 of 65) | not run |
 
 - **Asking Clef is not safe on real student essays.** It flagged 21 of 50 passages (15 of 29 documents)
   written between 2019 and November 2022, eight times the rate the public data suggested. Passages from
@@ -103,9 +103,6 @@ the flagging bar left exactly where the public data put it (5% of public human t
 - **The combinations did not.** Their weights were fitted on public human text, where this writer's essays
   would have looked unusual: the classifier's typical score for these essays sits far closer to AI text
   than public human text does, although mostly under the bar. Stacking detectors amplified that.
-- **The classifier, not Clef, tells this writer's older work from recent work.** The writer says much of
-  the recent work was AI-written or AI-revised. The classifier flags 48% of it against 8% of the older
-  work (AUROC 0.78 between the two); Clef flags 50% against 42% (AUROC 0.59).
 - **Re-setting the bar on these essays costs the classifier little.** With the bar moved to flag 5% of the
   pre-ChatGPT passages, it still catches 85% of AI text at 300 words (91% before); Clef drops from 76% to
   65% and its AUROC against this human writing is 0.77, against 0.94 for public human text.
