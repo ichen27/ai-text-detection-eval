@@ -1,14 +1,29 @@
-# ai-text-detection-eval
+# Proofmark
 
-Repository: https://github.com/ichen27/ai-text-detection-eval (private).
-Canonical checkout: `/Volumes/SamsungSSD1/code/ai-text-detection-eval` on the Mac mini SSD.
+Repository: https://github.com/ichen27/proofmark (public; it was named ai-text-detection-eval until
+2026-11-16, and the old address redirects).
+Canonical checkout: `/Volumes/SamsungSSD1/code/ai-text-detection-eval` on the Mac mini SSD. The directory
+and the Python package (`detecteval`) keep their original names.
+
+## Shipping decisions
+
+Recorded 2026-11-16.
+
+- **Launcher:** yes. Deployed to the app launcher as `proofmark`.
+- **Repository visibility:** public, MIT licence for the code.
+- **Name:** brand name, Proofmark, on GitHub and the launcher.
+- **Announcement:** X only. Post link: not posted yet.
+
+The repository is public, so nothing private may be committed: no texts, titles, ids or per-document
+scores from private writing, and no results for documents whose authorship is uncertain (use
+`private_eval report --omit-group`).
 
 ## What this is
 
-A small, reproducible experiment on detecting AI-written text. It compiles labelled text sets and
-compares three kinds of detector on them: decision models asked a typed question with no training
-(Cloudflare Clef), statistical detectors that need no training (Binoculars, Fast-DetectGPT), and a
-classifier fine-tuned on examples. It is an evaluation harness, not a detector product.
+A local AI-text detector (web app and MCP server) and the reproducible evaluation behind it. The
+evaluation compiles labelled text sets and compares three kinds of detector on them: decision models
+asked a typed question with no training (Cloudflare Clef), statistical detectors that need no training
+(Binoculars, Fast-DetectGPT), and a classifier fine-tuned on examples. The app uses the classifier.
 
 ## Layout
 
@@ -55,13 +70,13 @@ classifier fine-tuned on examples. It is an evaluation harness, not a detector p
 
 ## The deployed detector
 
-The service is deployed on the Mac mini through the app launcher as `ai-detector`
-(https://app-ai-detector.chenagent.com, owner sign-in) from [launcher.json](launcher.json), and is
-registered in the MCP hub as the lazy HTTP backend `ai-detector` (tools prefixed `ai_detector__`).
+The service is deployed on the Mac mini through the app launcher as `proofmark`
+(https://app-proofmark.chenagent.com, owner sign-in) from [launcher.json](launcher.json), and is
+registered in the MCP hub as the eager HTTP backend `proofmark` (tools prefixed `proofmark__`).
 
 - It runs from this canonical checkout with its own environment at
   `/Volumes/SamsungSSD1/tools/ai-text-detection/venv`, so `ci/run.sh` and `uv sync` here do not disturb
-  it. Code changes take effect on restart: `node src/cli.mjs restart ai-detector` in the launcher checkout.
+  it. Code changes take effect on restart: `node src/cli.mjs restart proofmark` in the launcher checkout.
   Keep the checkout on `main` when not actively working, or develop service changes in a worktree.
 - After changing dependencies, redeploy with the launcher's `deploy` command so the build step runs.
 - The service must stay light: models load in the worker on demand and the worker is stopped when idle.

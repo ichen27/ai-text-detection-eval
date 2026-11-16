@@ -1,15 +1,25 @@
-# ai-text-detection-eval
+# Proofmark
 
-How well can AI-written text be told from human writing, and what improves it?
+An AI-likelihood score for writing, with measured error rates. It is evidence, not proof.
 
-This repository is a small, reproducible experiment. It compiles labelled texts and compares three kinds
-of detector on them:
+Proofmark is two things in one repository:
+
+- **A detector you can run.** A local web app and MCP server give a text an AI likelihood from 1% to 99%
+  and say how often real human writing scores the same. Nothing leaves your machine. See
+  [Use the detector](#use-the-detector-web-app-and-mcp-server).
+- **The evaluation behind it.** A reproducible comparison of three kinds of detector on labelled texts,
+  including one student's private pre-ChatGPT writing. It is the reason the app uses a trained classifier
+  and does not ask a general model.
+
+The three kinds of detector compared:
 
 1. asking a general-purpose *decision model* (Cloudflare's Clef, on Workers AI) with no training;
 2. statistical detectors that need no training (Binoculars, Fast-DetectGPT);
 3. a classifier trained on examples, with and without examples from current models.
 
-It is an evaluation harness, not a detector. Nothing here should be used to accuse anyone of using AI.
+Status: a working research project, not a product. The classifier is a small model trained in an hour,
+and the private-writing test covers one writer. Nothing here should be used on its own to accuse anyone
+of using AI.
 
 ## Results in brief (15 November 2026)
 
@@ -203,8 +213,8 @@ Prerequisites: Python 3.11+, [uv](https://docs.astral.sh/uv/). Calling the Clef 
 text also needs a Cloudflare account with Workers AI.
 
 ```sh
-git clone https://github.com/ichen27/ai-text-detection-eval.git
-cd ai-text-detection-eval
+git clone https://github.com/ichen27/proofmark.git
+cd proofmark
 uv sync
 bash ci/run.sh                        # lint and unit tests; needs no credentials
 uv run python -m detecteval.report    # first study: rebuild report and figures from committed scores
@@ -345,7 +355,7 @@ Binoculars and the classifier run locally: about 30 minutes and 60 minutes on an
 | Reports | [results/report.md](results/report.md), [results/comparison.md](results/comparison.md), [results/private_writing.md](results/private_writing.md), with `.json` twins | Markdown, JSON | `report`, `compare`, `private_eval report` |
 | Figures | [results/figures/](results/figures/) | PNG | `report`, `compare` |
 | Reference scores for the detector app | [results/calibration.json](results/calibration.json) | JSON | `calibration` |
-| Trained classifiers (2 × 306 MB) | [release v0.3.0](https://github.com/ichen27/ai-text-detection-eval/releases/tag/v0.3.0) | Hugging Face model folders, gzipped tar | Extract into `RAW_DATA_DIR/models/`, then `python -m detecteval.classify raid mirrors`; or retrain with `train_classifier` |
+| Trained classifiers (2 × 306 MB) | [release v0.3.0](https://github.com/ichen27/proofmark/releases/tag/v0.3.0) | Hugging Face model folders, gzipped tar | Extract into `RAW_DATA_DIR/models/`, then `python -m detecteval.classify raid mirrors`; or retrain with `train_classifier` |
 
 SHA-256 of the release files: `classifier-raid.tar.gz` `81ae99d8aa214fe596a5799cac1b5a19c8f67da5989284e9639a3431d535a9f5`,
 `classifier-mirrors.tar.gz` `84b41fcb72116e3a19c03e13c670aeccfc1a08f0184dead8b409ab02825b9d0e`.
@@ -377,8 +387,9 @@ a dataset, prompts or the seed, regenerate scores and reports in the same pull r
 
 ## Licence and attribution
 
-No licence has been chosen for the code yet, so default copyright applies. The evaluation sets include
-short excerpts from RAID and from Liang et al. (2023), both MIT-licensed, and Stack Exchange posts under
-CC BY-SA 4.0, which stay under that licence. Sources, attributions, the papers whose methods are
+The code is released under the [MIT licence](LICENSE). The data keeps its own terms: the evaluation sets
+include short excerpts from RAID and from Liang et al. (2023), both MIT-licensed, and Stack Exchange posts
+under CC BY-SA 4.0, which stay under that licence. The released classifier weights are fine-tuned from
+`distilbert/distilroberta-base` (Apache-2.0). Sources, attributions, the papers whose methods are
 implemented here and the models downloaded at run time are listed in
 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).

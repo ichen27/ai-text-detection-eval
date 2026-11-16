@@ -1,8 +1,8 @@
 {
-  "id": "ai-detector",
-  "name": "AI Text Detector",
-  "description": "Scores how AI-like a text is and how often human writing scores the same. Runs locally.",
-  "icon": "AI",
+  "id": "proofmark",
+  "name": "Proofmark",
+  "description": "An AI-likelihood score for writing, with how often human writing scores the same. Runs locally.",
+  "icon": "PM",
   "color": "#d9e4f2",
   "tags": ["tools", "writing"],
   "favorite": false,

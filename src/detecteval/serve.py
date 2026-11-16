@@ -1,4 +1,4 @@
-"""The detector as a small web app and an MCP server, in one process.
+"""Proofmark: the detector as a small web app and an MCP server, in one process.
 
     python -m detecteval.serve          # needs the "ml" and "serve" dependency groups
 
@@ -216,7 +216,7 @@ async def api_detect(request: Request) -> JSONResponse:
 
 
 mcp = MCPServer(
-    "AI text detector",
+    "Proofmark",
     instructions="Scores how AI-like a text is, with measured error rates. A result is evidence, not a verdict: "
                  "never present it as proof that someone used AI.")
 
